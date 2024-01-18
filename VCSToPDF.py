@@ -21,34 +21,34 @@ st.session_state.setdefault("text_dict", {})
 st.session_state.setdefault("code_dict", {})
 
 # Input fields
-task = st.text_input("App Version:")
+app_version = st.text_input("App Version:")
 if st.button("Save App Version"):
-    st.session_state.task_list.append(task)
+    st.session_state.task_list.append(app_version)
 
-text = st.text_area("Enter Regression Testing Notes:")
+regression_notes = st.text_area("Enter Regression Testing Notes:")
 if st.button("Save Regression Testing Notes"):
-    st.session_state.text_dict.setdefault(task, []).append(text)
+    st.session_state.text_dict.setdefault(app_version, []).append(regression_notes)
 
 # Ace editor for code
 code = st_ace(language="python", theme="monokai", key="ace-editor")
 if st.button("Save Code"):
-    st.session_state.code_dict.setdefault(task, []).append(code)
+    st.session_state.code_dict.setdefault(app_version, []).append(code)
 
 # Display saved items
 st.write("## Saved Items")
-for task in st.session_state.task_list:
-    st.write(f"### Task: {task}")
+for app_version in st.session_state.task_list:
+    st.write(f"### App Version: {app_version}")
 
     # Display text
-    if task in st.session_state.text_dict:
-        st.write("#### Text:")
-        for text in st.session_state.text_dict[task]:
+    if app_version in st.session_state.text_dict:
+        st.write("#### Regression Testing Notes:")
+        for text in st.session_state.text_dict[app_version]:
             st.write(f"- {text}")
 
     # Display code
-    if task in st.session_state.code_dict:
+    if app_version in st.session_state.code_dict:
         st.write("#### Code:")
-        for code in st.session_state.code_dict[task]:
+        for code in st.session_state.code_dict[app_version]:
             code_paragraph_style = ParagraphStyle(
                 name='CodeStyle', fontName='Courier', fontSize=8, leftIndent=10, rightIndent=10, leading=8, wordWrap='CJK'
             )
@@ -65,19 +65,19 @@ if st.button("Generate PDF"):
     # Create a list of elements for the PDF
     pdf_elements = []
 
-    for task in st.session_state.task_list:
-        pdf_elements.append(Paragraph(f"Task: {task}", styles['Heading1']))
+    for app_version in st.session_state.task_list:
+        pdf_elements.append(Paragraph(f"App Version: {app_version}", styles['Heading1']))
 
         # Display text
-        if task in st.session_state.text_dict:
-            pdf_elements.append(Paragraph("Text:", styles['Heading2']))
-            for text in st.session_state.text_dict[task]:
+        if app_version in st.session_state.text_dict:
+            pdf_elements.append(Paragraph("Regression Testing Notes:", styles['Heading2']))
+            for text in st.session_state.text_dict[app_version]:
                 pdf_elements.append(Paragraph(f"- {text}", styles['Normal']))
 
         # Display code
-        if task in st.session_state.code_dict:
+        if app_version in st.session_state.code_dict:
             pdf_elements.append(Paragraph("Code:", styles['Heading2']))
-            for code in st.session_state.code_dict[task]:
+            for code in st.session_state.code_dict[app_version]:
                 code_paragraph_style = ParagraphStyle(
                     name='CodeStyle', fontName='Courier', fontSize=8, leftIndent=10, rightIndent=10, leading=8, wordWrap='CJK'
                 )
