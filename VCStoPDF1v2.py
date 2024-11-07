@@ -15,45 +15,13 @@ def create_download_link_pdf(pdf_data, download_filename):
 # Initialize session states
 if 'task_list' not in st.session_state:
     st.session_state.task_list = []
-if 'link_dict' not in st.session_state:
-    st.session_state.link_dict = {}
-if 'file_dict' not in st.session_state:
-    st.session_state.file_dict = {}
 if 'text_dict' not in st.session_state:
     st.session_state.text_dict = {}
 if 'code_dict' not in st.session_state:
     st.session_state.code_dict = {}
-if 'custom_inputs' not in st.session_state:
-    st.session_state.custom_inputs = {}
-if 'input_counter' not in st.session_state:
-    st.session_state.input_counter = 0
-
-# Function to add new custom input field
-def add_custom_input():
-    st.session_state.input_counter += 1
-    st.session_state.custom_inputs[st.session_state.input_counter] = {
-        'label': '',
-        'value': ''
-    }
-
-# Function to save custom input
-def save_custom_input(counter, app_version):
-    input_data = st.session_state.custom_inputs[counter]
-    if input_data['label'] and input_data['value']:
-        if app_version not in st.session_state.text_dict:
-            st.session_state.text_dict[app_version] = []
-        st.session_state.text_dict[app_version].append(
-            f"{input_data['label']}: {input_data['value']}"
-        )
 
 # Main app layout
-st.title("Enhanced Testing Documentation App")
-
-# Sidebar for adding new input fields
-with st.sidebar:
-    st.header("Custom Input Fields")
-    if st.button("Add New Input Field"):
-        add_custom_input()
+st.title("Testing Documentation App")
 
 # Input fields
 app_version = st.text_input("App Version:")
@@ -68,22 +36,6 @@ if app_version:
         if app_version not in st.session_state.text_dict:
             st.session_state.text_dict[app_version] = []
         st.session_state.text_dict[app_version].append(f"Regression Notes: {regression_notes}")
-
-    # Custom input fields
-    st.header("Custom Input Fields")
-    for counter in st.session_state.custom_inputs:
-        col1, col2, col3 = st.columns([2, 3, 1])
-        with col1:
-            st.session_state.custom_inputs[counter]['label'] = st.text_input(
-                "Field Label", key=f"label_{counter}"
-            )
-        with col2:
-            st.session_state.custom_inputs[counter]['value'] = st.text_input(
-                "Field Value", key=f"value_{counter}"
-            )
-        with col3:
-            if st.button("Save", key=f"save_{counter}"):
-                save_custom_input(counter, app_version)
 
     # Multiple code editors
     st.header("Code Input Sections")
@@ -113,7 +65,7 @@ for app_version in st.session_state.task_list:
 
     # Display text inputs
     if app_version in st.session_state.text_dict:
-        st.write("#### Notes and Custom Fields:")
+        st.write("#### Notes:")
         for text in st.session_state.text_dict[app_version]:
             st.write(f"- {text}")
 
@@ -137,7 +89,7 @@ if st.button("Generate PDF"):
 
         # Add text content
         if app_version in st.session_state.text_dict:
-            pdf_elements.append(Paragraph("Notes and Custom Fields:", styles['Heading2']))
+            pdf_elements.append(Paragraph("Notes:", styles['Heading2']))
             for text in st.session_state.text_dict[app_version]:
                 pdf_elements.append(Paragraph(f"- {text}", styles['Normal']))
             pdf_elements.append(Spacer(1, 10))
