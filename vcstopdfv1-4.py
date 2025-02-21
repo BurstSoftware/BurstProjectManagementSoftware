@@ -6,12 +6,29 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatted
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import google.generativeai as genai
+import json
 
 # Function to create download PDF link
 def create_download_link_pdf(pdf_data, download_filename):
     b64 = base64.b64encode(pdf_data).decode()
     href = f'<a href="data:application/pdf;base64,{b64}" download="{download_filename}">Download PDF</a>'
     return href
+
+# Function to get saved items as context
+def get_saved_items_context():
+    context = {}
+    for app_version in st.session_state.task_list:
+        version_data = {}
+        if app_version in st.session_state.interpreter_dict:
+            version_data["interpreter_version"] = st.session_state.interpreter_dict[app_version]
+        if app_version in st.session_state.text_dict:
+            version_data["notes"] = st.session_state.text_dict[app_version]
+        if app_version in st.session_state.terminal_dict:
+            version_data["terminal_outputs"] = st.session_state.terminal_dict[app_version]
+        if app_version in st.session_state.code_dict:
+            version_data["code_sections"] = st.session_state.code_dict[app_version]
+        context[app_version] = version_data
+    return json.dumps(context, indent=2)
 
 # Initialize session states
 if 'task_list' not in st.session_state:
@@ -32,27 +49,33 @@ if 'gemini_response' not in st.session_state:
 # Main app layout
 st.title("Testing Documentation App")
 
-# Gemini API Key Section
-st.header("Gemini AI Configuration")
-gemini_api_key = st.text_input("Enter Gemini AI API Key:", type="password")
-if st.button("Save API Key"):
-    st.session_state.gemini_api_key = gemini_api_key
-    genai.configure(api_key=gemini_api_key)
-    st.success("API Key saved successfully!")
-
-# Gemini AI Query Section
-if st.session_state.gemini_api_key:
-    st.header("Gemini AI Query")
-    gemini_query = st.text_area("Enter your query for Gemini AI:")
-    if st.button("Submit to Gemini AI"):
-        try:
-            model = genai.GenerativeModel('gemini-pro')
-            response = model.generate_content(gemini_query)
-            st.session_state.gemini_response = response.text
-            st.write("Gemini AI Response:")
-            st.write(st.session_state.gemini_response)
-        except Exception as e:
-            st.error(f"Error calling Gemini AI: {str(e)}")
+# Sidebar for Gemini AI Configuration
+with st.sidebar:
+    st.header("Gemini AI Configuration")
+    gemini_api_key = st.text_input("Enter Gemini AI API Key:", type="password", key="gemini_key")
+    if st.button("Save API Key"):
+        st.session_state.gemini_api_key = gemini_api_key
+        genai.configure(api_key=gemini_api_key)
+        st.success("API Key saved successfully!")
+    
+    if st.session_state.gemini_api_key:
+        st.subheader("Gemini AI Query")
+        gemini_query = st.text_area("Enter your query:", key="gemini_query")
+        include_context = st.checkbox("Include Saved Items as context")
+        
+        if st.button("Submit to Gemini AI"):
+            try:
+                model = genai.GenerativeModel('gemini-pro')
+                query_content = gemini_query
+                if include_context:
+                    context = get_saved_items_context()
+                    query_content = f"Context:\n{context}\n\nQuery:\n{gemini_query}"
+                response = model.generate_content(query_content)
+                st.session_state.gemini_response = response.text
+                st.write("Gemini AI Response:")
+                st.write(st.session_state.gemini_response)
+            except Exception as e:
+                st.error(f"Error calling Gemini AI: {str(e)}")
 
 # Version Input Section
 st.header("Version Information")
@@ -60,7 +83,7 @@ col1, col2 = st.columns(2)
 with col1:
     app_version = st.text_input("App Version:")
 with col2:
-    interpreter_version = st.text_input("Interpreter Version:", placeholder="e.g., Python 3.9.0")
+    interpreter_version = st.text_input("Interpreter Version:", placeholder="e.g., Python 3.10.11")
 
 if st.button("Save Version Information"):
     if app_version and app_version not in st.session_state.task_list:
@@ -114,24 +137,20 @@ st.write("## Saved Items")
 for app_version in st.session_state.task_list:
     st.write(f"### App Version: {app_version}")
     
-    # Display interpreter version
     if app_version in st.session_state.interpreter_dict:
         st.write(f"**Interpreter Version:** {st.session_state.interpreter_dict[app_version]}")
 
-    # Display text inputs
     if app_version in st.session_state.text_dict:
         st.write("#### Notes:")
         for text in st.session_state.text_dict[app_version]:
             st.write(f"- {text}")
 
-    # Display terminal outputs
     if app_version in st.session_state.terminal_dict:
         st.write("#### Terminal Outputs:")
         for i, output in enumerate(st.session_state.terminal_dict[app_version]):
             with st.expander(f"Terminal Output {i+1}"):
                 st.code(output, language="bash")
 
-    # Display code sections
     if app_version in st.session_state.code_dict:
         st.write("#### Code Sections:")
         for i, code in enumerate(st.session_state.code_dict[app_version]):
@@ -143,9 +162,8 @@ if st.button("Generate PDF"):
     pdf_buffer = BytesIO()
     doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, leftMargin=36, rightMargin=36)
     styles = getSampleStyleSheet()
-
     pdf_elements = []
-    
+
     # Add Gemini AI Section to PDF
     if st.session_state.gemini_api_key:
         pdf_elements.append(Paragraph("Gemini AI Configuration", styles['Heading1']))
