@@ -6,7 +6,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatte
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import os
 import requests
-from streamlit_extras.app_logo import add_logo
+#from streamlit_extras.app_logo import add_logo # Removed
 from streamlit_extras.colored_header import colored_header
 from streamlit_extras.buy_me_a_coffee import button
 from streamlit_option_menu import option_menu
@@ -48,7 +48,7 @@ def local_css(file_name):
 local_css("style/style.css")
 
 # --- LOAD ASSETS ---
-add_logo("images/Seal_of_MIT.svg.png", height=150)
+#add_logo("images/Seal_of_MIT.svg.png", height=150) # Removed
 
 # Sidebar for navigation
 with st.sidebar:
