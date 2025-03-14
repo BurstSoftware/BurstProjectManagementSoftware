@@ -1,0 +1,38 @@
+/* style/style.css */
+
+.sidebar .sidebar-content {
+    background-color: #f0f2f6;
+}
+
+.stTextInput label,
+.stTextArea label {
+    color: #333;
+    font-weight: bold;
+}
+
+.stButton>button {
+    color: white;
+    background-color: #4CAF50; /* Green */
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.stButton>button:hover {
+    background-color: #3e8e41;
+}
+
+.reportview-container .main .block-container{
+    padding-top: 10px;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-bottom: 20px;
+}
+
+/* Add more styles as needed */
