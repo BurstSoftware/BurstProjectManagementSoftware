@@ -25,7 +25,7 @@ with col1:
     interpreter = st.text_input("Interpreter", "Python 3.9")
 with col2:
     ide = st.text_input("IDE/Text Editor", "VS Code")
-    framework = st.text_input("Framework", "Streamlit")
+    framework = st.text_input("Framework", "Streamlit")  # Allow any framework to be entered
 
 # Google AI Studio API Key input
 google_api_key = st.text_input("Google AI Studio API Key", type="password")
@@ -91,10 +91,18 @@ def generate_codebase():
         first_line = content.split('\n')[0].strip()
         app_name_version = first_line[1:].strip()  # Remove the initial '#' and leading/trailing spaces
 
+        framework_import = ""
+        if framework.lower() == "streamlit":
+            framework_import = "import streamlit as st"
+        elif framework.lower() == "tkinter":
+            framework_import = "import tkinter as tk"
+            framework_import += "\nfrom tkinter import ttk" # Optional, but often used
+        elif framework.lower() == "pygame":
+            framework_import = "import pygame"
+        # Add more framework imports here as needed
+
         code += f"""
 # {'#' if app_name_version else ''} {app_name_version if app_name_version else f"ReportLab Instance {i+1}"}
-import streamlit as st
-
 # App Configuration (based on user input)
 # The configuration below is NOT passed to the AI. It is just for documentation.
 VERSION = '{app_version}'
@@ -102,13 +110,15 @@ INTERPRETER = '{interpreter}'
 IDE = '{ide}'
 FRAMEWORK = '{framework}'
 
-st.title('{app_name_version if app_name_version else "Generated App"}')
+{framework_import}
+
+# {app_name_version if app_name_version else "Generated App"}
 
 # Features from ReportLab instance #{i+1}
 """
         for line in content.split('\n')[1:]:
             if line.strip():
-                code += f"st.write('{line.strip()}')\n"
+                code += f"#st.write('{line.strip()}')\n"  #Commented out for all cases since framework is variable
     return code
 
 # Generate codebase only for the AI.
@@ -119,18 +129,28 @@ def generate_codebase_for_ai():
         first_line = content.split('\n')[0].strip()
         app_name_version = first_line[1:].strip()  # Remove the initial '#' and leading/trailing spaces
 
+        framework_import = ""
+        if framework.lower() == "streamlit":
+            framework_import = "import streamlit as st"
+        elif framework.lower() == "tkinter":
+            framework_import = "import tkinter as tk"
+            framework_import += "\nfrom tkinter import ttk" # Optional, but often used
+        elif framework.lower() == "pygame":
+            framework_import = "import pygame"
+        # Add more framework imports here as needed
+
         code += f"""
 # {'#' if app_name_version else ''} {app_name_version if app_name_version else f"ReportLab Instance {i+1}"}
-import streamlit as st
 
+{framework_import}
 
-st.title('{app_name_version if app_name_version else "Generated App"}')
+# {app_name_version if app_name_version else "Generated App"}
 
 # Features from ReportLab instance #{i+1}
 """
         for line in content.split('\n')[1:]:
             if line.strip():
-                code += f"st.write('{line.strip()}')\n"
+                code += f"#st.write('{line.strip()}')\n" #Commented out for all cases since framework is variable
     return code
 
 def generate_code_with_ai(api_key, codebase, interpreter, framework):
@@ -141,16 +161,15 @@ def generate_code_with_ai(api_key, codebase, interpreter, framework):
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-pro-latest')
         prompt = f"""
-        You are a helpful AI assistant that helps to generate python code for streamlit applications based on the following codebase,
-        and adds implementation details with comments.  The app name and version are defined in the first comment of the codebase.  The code should use {interpreter} and {framework}.
+        You are a helpful AI assistant that helps to generate python code for applications based on the following codebase,
+        and adds implementation details with comments.  The app name and version are defined in the first comment of the codebase.  The code should use {interpreter} and the {framework} framework.
 
         Codebase:
         ```python
         {codebase}
         ```
 
-        Generate the fully implemented code base. Use streamlit to show the results and UI.
-        Add comments to explain the code.  Make sure the initial comment (app name and version) is preserved. Do not include VERSION, INTERPRETER, IDE, or FRAMEWORK in the code base since the user already specified this in the config.
+        Generate the fully implemented code base. Add comments to explain the code.  Make sure the initial comment (app name and version) is preserved. Do not include VERSION, INTERPRETER, IDE, or FRAMEWORK in the code base since the user already specified this in the config. Ensure that the import statement matches the specified framework.
         """
 
         response = model.generate_content(prompt)
@@ -220,4 +239,5 @@ st.sidebar.write("""
 6. Generate the initial codebase.
 7. Click "Generate Code with AI" to enhance the codebase using Google AI Studio. The (Interpreter and Framework) and (Ideas/Notes) will be sent to the AI to create the app. The other inputs will be saved to the application.
 8. Export to PDF when ready
+9. The generated import statement depends on the value set for Framework (e.g., Streamlit, Tkinter, Pygame).
 """)
