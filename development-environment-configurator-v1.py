@@ -280,21 +280,3 @@ else:
 if st.session_state.ai_generated_code_list:
     for index, code in enumerate(st.session_state.ai_generated_code_list):
        display_ai_generated_code(code, index)
-# Instructions
-
-# Instructions
-st.sidebar.header("Instructions")
-st.sidebar.write("""
-1. Enter app configuration details
-2. Input Google AI Studio API Key (optional)
-3. Add iterations using the button
-4. In each iteration, the *first* line (starting with #) will be used as the application name and version.  If no first line is provided, it will default to Iteration #.
-5. Type ideas (following the first line).
-6. Generate the initial codebase. This will generate the intial code base for the AI to use
-7. Click "Generate Code with AI" to enhance the codebase using Google AI Studio. The (Interpreter and Framework) and (Ideas/Notes) will be sent to the AI to create the app. The generated code will be displayed.
-8. Clicking on Generate with AI will save the iteration in the side menu on the left
-9. You can delete any of the generated code
-10. You can copy the generated code and use it in iterations
-11. Export to PDF when ready
-12. The generated import statement depends on the value set for Framework (e.g., Streamlit, Tkinter, Pygame).
-""")
