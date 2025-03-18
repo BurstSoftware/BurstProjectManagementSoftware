@@ -83,7 +83,7 @@ def generate_pdf():
     buffer.seek(0)
     return buffer
 
-# Generate codebase
+# Generate codebase for display in the app
 def generate_codebase():
     code = ""
     for i, content in enumerate(st.session_state.reportlab_instances):
@@ -96,6 +96,7 @@ def generate_codebase():
 import streamlit as st
 
 # App Configuration (based on user input)
+# The configuration below is NOT passed to the AI. It is just for documentation.
 VERSION = '{app_version}'
 INTERPRETER = '{interpreter}'
 IDE = '{ide}'
@@ -110,7 +111,29 @@ st.title('{app_name_version if app_name_version else "Generated App"}')
                 code += f"st.write('{line.strip()}')\n"
     return code
 
-def generate_code_with_ai(api_key, codebase):
+# Generate codebase only for the AI.
+def generate_codebase_for_ai():
+    code = ""
+    for i, content in enumerate(st.session_state.reportlab_instances):
+        # Extract the first line (the app name and version if specified)
+        first_line = content.split('\n')[0].strip()
+        app_name_version = first_line[1:].strip()  # Remove the initial '#' and leading/trailing spaces
+
+        code += f"""
+# {'#' if app_name_version else ''} {app_name_version if app_name_version else f"ReportLab Instance {i+1}"}
+import streamlit as st
+
+
+st.title('{app_name_version if app_name_version else "Generated App"}')
+
+# Features from ReportLab instance #{i+1}
+"""
+        for line in content.split('\n')[1:]:
+            if line.strip():
+                code += f"st.write('{line.strip()}')\n"
+    return code
+
+def generate_code_with_ai(api_key, codebase, interpreter, framework):
     """
     Generates code using Google AI Studio based on the provided codebase and API key.
     """
@@ -119,7 +142,7 @@ def generate_code_with_ai(api_key, codebase):
         model = genai.GenerativeModel('gemini-1.5-pro-latest')
         prompt = f"""
         You are a helpful AI assistant that helps to generate python code for streamlit applications based on the following codebase,
-        and adds implementation details with comments.  The app name and version are defined in the first comment of the codebase. Use the specified python version and framework.
+        and adds implementation details with comments.  The app name and version are defined in the first comment of the codebase.  The code should use {interpreter} and {framework}.
 
         Codebase:
         ```python
@@ -127,7 +150,7 @@ def generate_code_with_ai(api_key, codebase):
         ```
 
         Generate the fully implemented code base. Use streamlit to show the results and UI.
-        Add comments to explain the code.  Make sure the initial comment (app name and version) is preserved.
+        Add comments to explain the code.  Make sure the initial comment (app name and version) is preserved. Do not include VERSION, INTERPRETER, IDE, or FRAMEWORK in the code base since the user already specified this in the config.
         """
 
         response = model.generate_content(prompt)
@@ -168,9 +191,10 @@ if st.button("Generate Codebase"):
 
 # AI Code Generation Button
 if st.button("Generate Code with AI"):
-    if st.session_state.generated_code and google_api_key:
+    if st.session_state.reportlab_instances and google_api_key:
         try:
-            ai_generated_code = generate_code_with_ai(google_api_key, st.session_state.generated_code)
+            codebase_for_ai = generate_codebase_for_ai()
+            ai_generated_code = generate_code_with_ai(google_api_key, codebase_for_ai, interpreter, framework)
             if ai_generated_code:
                 st.subheader("AI Generated Codebase")
                 st.code(ai_generated_code, language="python")
@@ -181,10 +205,9 @@ if st.button("Generate Code with AI"):
         except Exception as e:
             st.error(f"AI code generation failed: {str(e)}")
             traceback.print_exc()
-    elif not st.session_state.generated_code:
-        st.warning("Please generate the initial codebase first.")
-    elif not google_api_key:
-        st.warning("Please enter your Google AI Studio API Key.")
+    else:
+        st.warning("Please generate the initial codebase and/or enter API Key first.")
+
 
 # Instructions
 st.sidebar.header("Instructions")
@@ -195,6 +218,6 @@ st.sidebar.write("""
 4. In each instance, the *first* line (starting with #) will be used as the application name and version.  If no first line is provided, it will default to ReportLab Instance #.
 5. Type ideas (following the first line).
 6. Generate the initial codebase.
-7. Click "Generate Code with AI" to enhance the codebase using Google AI Studio.
+7. Click "Generate Code with AI" to enhance the codebase using Google AI Studio. The (Interpreter and Framework) and (Ideas/Notes) will be sent to the AI to create the app. The other inputs will be saved to the application.
 8. Export to PDF when ready
 """)
