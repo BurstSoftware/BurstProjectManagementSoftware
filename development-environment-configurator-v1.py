@@ -209,12 +209,14 @@ if st.button("Generate Codebase"):
     if st.session_state.reportlab_instances:
         try:
             st.session_state.generated_code = generate_codebase()
+            st.subheader("Generated Codebase")
+            st.code(st.session_state.generated_code, language="python")  # Display the generated code
+
         except Exception as e:
             st.error(f"Code generation failed: {str(e)}")
             traceback.print_exc()
     else:
         st.warning("Please add at least one iteration first")
-
 
 # Function to display AI generated code with a delete button
 def display_ai_generated_code(code, index):
@@ -239,16 +241,12 @@ if st.button("Generate Code with AI"):
             codebase_for_ai = generate_codebase_for_ai()
             ai_generated_code = generate_code_with_ai(google_api_key, codebase_for_ai, interpreter, framework)
             if ai_generated_code:
-                st.session_state.ai_generated_code_list.append(ai_generated_code)
-                st.success("AI-generated codebase added.") # Remove what AI code
-
+                st.session_state.ai_generated_code_list.append(ai_generated_code) # append to AI code list
         except Exception as e:
             st.error(f"AI code generation failed: {str(e)}")
             traceback.print_exc()
     else:
         st.warning("Please generate the initial codebase and/or enter API Key first.")
-
-
 
 # Instructions
 st.sidebar.header("Instructions")
@@ -258,7 +256,7 @@ st.sidebar.write("""
 3. Add iterations using the button
 4. In each iteration, the *first* line (starting with #) will be used as the application name and version.  If no first line is provided, it will default to Iteration #.
 5. Type ideas (following the first line).
-6. Generate the initial codebase.
+6. Generate the initial codebase. This will generate the intial code base for the AI to use
 7. Click "Generate Code with AI" to enhance the codebase using Google AI Studio. The (Interpreter and Framework) and (Ideas/Notes) will be sent to the AI to create the app. The generated code will be displayed.
 8. You can delete any of the generated code
 9. You can copy the generated code and use it in iterations
