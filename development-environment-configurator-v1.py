@@ -16,9 +16,8 @@ if 'generated_code' not in st.session_state:
     st.session_state.generated_code = ""
 if 'ai_generated_code_list' not in st.session_state:
     st.session_state.ai_generated_code_list = [] # store AI-Generated Code
-if 'show_ai_generated_code' not in st.session_state:
-    st.session_state.show_ai_generated_code = False
-
+if 'saved_iterations' not in st.session_state:
+    st.session_state.saved_iterations = []
 
 # Main app title
 st.title("Development Environment Configurator")
@@ -235,18 +234,53 @@ if st.button("Generate Code with AI"):
             codebase_for_ai = generate_codebase_for_ai()
             ai_generated_code = generate_code_with_ai(google_api_key, codebase_for_ai, interpreter, framework)
             if ai_generated_code:
+
+                #Save the current iteriation
+                current_iteration = {
+                    "App Version": app_version,
+                    "Interpreter": interpreter,
+                    "IDE/Text Editor": ide,
+                    "Framework": framework,
+                    "Iterations": st.session_state.reportlab_instances
+                }
+
+                st.session_state.saved_iterations.append(current_iteration)
+
+                #Clear the current itieration for the app
+                st.session_state.reportlab_instances = []
+                app_version = ""
+                interpreter = ""
+                ide = ""
+                framework = ""
+
                 st.session_state.ai_generated_code_list.append(ai_generated_code) # append to AI code list
+                st.experimental_rerun()
         except Exception as e:
             st.error(f"AI code generation failed: {str(e)}")
             traceback.print_exc()
     else:
         st.warning("Please generate the initial codebase and/or enter API Key first.")
 
+# Display saved iterations in the sidebar
+st.sidebar.header("Saved Iterations")
+if st.session_state.saved_iterations:
+    for i, iteration in enumerate(st.session_state.saved_iterations):
+        with st.sidebar.expander(f"Iteration {i+1}"):
+            st.write(f"App Version: {iteration['App Version']}")
+            st.write(f"Interpreter: {iteration['Interpreter']}")
+            st.write(f"IDE/Text Editor: {iteration['IDE/Text Editor']}")
+            st.write(f"Framework: {iteration['Framework']}")
+            st.write("Iterations")
+            for code in iteration['Iterations']:
+                 st.code(code, language="python") # Code
+else:
+    st.sidebar.write("No saved iterations yet.")
 
 # Display all generated code with delete buttons
 if st.session_state.ai_generated_code_list:
     for index, code in enumerate(st.session_state.ai_generated_code_list):
        display_ai_generated_code(code, index)
+# Instructions
 
 # Instructions
 st.sidebar.header("Instructions")
@@ -258,8 +292,9 @@ st.sidebar.write("""
 5. Type ideas (following the first line).
 6. Generate the initial codebase. This will generate the intial code base for the AI to use
 7. Click "Generate Code with AI" to enhance the codebase using Google AI Studio. The (Interpreter and Framework) and (Ideas/Notes) will be sent to the AI to create the app. The generated code will be displayed.
-8. You can delete any of the generated code
-9. You can copy the generated code and use it in iterations
-10. Export to PDF when ready
-11. The generated import statement depends on the value set for Framework (e.g., Streamlit, Tkinter, Pygame).
+8. Clicking on Generate with AI will save the iteration in the side menu on the left
+9. You can delete any of the generated code
+10. You can copy the generated code and use it in iterations
+11. Export to PDF when ready
+12. The generated import statement depends on the value set for Framework (e.g., Streamlit, Tkinter, Pygame).
 """)
