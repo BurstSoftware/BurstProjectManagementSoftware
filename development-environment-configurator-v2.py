@@ -18,7 +18,7 @@ if 'clear_iteration_trigger' not in st.session_state:
     st.session_state.clear_iteration_trigger = False  # Flag to trigger clearing current iteration
 
 # Main app title
-st.title("Iterative Code Generator")
+st.title("Burst Software AI Code Iterator")
 
 # Configuration section
 with st.expander("Configuration", expanded=True):
