@@ -9,9 +9,11 @@ import google.generativeai as genai
 if 'iteration_history' not in st.session_state:
     st.session_state.iteration_history = []  # List of all iteration states
 if 'current_iteration' not in st.session_state:
-    st.session_state.current_iteration = ""  # Current working iteration
+    st.session_state.current_iteration = "# MyApp"  # Default value
 if 'ai_generated_code' not in st.session_state:
     st.session_state.ai_generated_code = []  # AI-generated versions
+if 'reset_trigger' not in st.session_state:
+    st.session_state.reset_trigger = False  # Flag to trigger reset
 
 # Main app title
 st.title("Iterative Code Generator")
@@ -31,7 +33,7 @@ with st.expander("Configuration", expanded=True):
 st.header("Current Iteration")
 current_iteration = st.text_area(
     "Current Iteration (starts with # for app name)",
-    value=st.session_state.current_iteration or "# MyApp",
+    value=st.session_state.current_iteration if not st.session_state.reset_trigger else "# MyApp",
     key="current_iteration"
 )
 
@@ -49,7 +51,8 @@ with col4:
 # Save current iteration to history
 if save_iteration and current_iteration.strip():
     st.session_state.iteration_history.append(current_iteration)
-    st.session_state.current_iteration = current_iteration  # Keep current for further editing
+    st.session_state.current_iteration = current_iteration  # Update session state
+    st.session_state.reset_trigger = False  # Ensure reset flag is off
     st.rerun()
 
 # PDF generation
@@ -68,7 +71,6 @@ def generate_pdf():
     c.drawString(100, y, f"Framework: {framework}")
     y -= 40
     
-    # Document all iterations from history
     for i, content in enumerate(st.session_state.iteration_history):
         if y < 50:
             c.showPage()
@@ -82,7 +84,6 @@ def generate_pdf():
             c.drawString(120, y, line[:80])
             y -= 15
     
-    # Add current iteration if not yet saved
     if current_iteration not in st.session_state.iteration_history:
         if y < 50:
             c.showPage()
@@ -124,7 +125,6 @@ def generate_ai_code(api_key):
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-pro-latest')
         base_code = generate_codebase()
-        # Use plain string concatenation to avoid f-string backslash issues
         prompt = "Generate improved Python code based on this current iteration:\n" + \
                  "```python\n" + \
                  base_code + \
@@ -169,6 +169,7 @@ if st.session_state.iteration_history:
             st.text_area(f"Iteration #{i + 1}", iteration, disabled=True)
             if st.button("Load to Current", key=f"load_{i}"):
                 st.session_state.current_iteration = iteration
+                st.session_state.reset_trigger = False  # Ensure reset flag is off
                 st.rerun()
 
 # Display AI generated codes
@@ -184,6 +185,6 @@ if st.session_state.ai_generated_code:
 # Clear everything
 if st.button("Clear All"):
     st.session_state.iteration_history = []
-    st.session_state.current_iteration = ""
     st.session_state.ai_generated_code = []
+    st.session_state.reset_trigger = True  # Trigger reset of current_iteration
     st.rerun()
