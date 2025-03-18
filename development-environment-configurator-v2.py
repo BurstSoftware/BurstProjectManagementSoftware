@@ -124,13 +124,14 @@ def generate_ai_code(api_key):
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-pro-latest')
         base_code = generate_codebase()
-        prompt = f"""
-        Generate improved Python code based on this current iteration:
-        ```python
-        {base_code}
-        ```
-        Use {framework} framework and add detailed comments. Preserve the app name from the first line: {current_iteration.split('\n')[0]}
-        """
+        # Use regular string concatenation instead of f-string with backslashes
+        prompt = (
+            "Generate improved Python code based on this current iteration:\n"
+            "```python\n" +
+            base_code +
+            "\n```\n" +
+            f"Use {framework} framework and add detailed comments. Preserve the app name from the first line: {current_iteration.split('\n')[0]}"
+        )
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
