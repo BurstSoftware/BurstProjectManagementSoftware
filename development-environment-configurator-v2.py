@@ -124,7 +124,7 @@ def generate_ai_code(api_key):
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-pro-latest')
         base_code = generate_codebase()
-        # Use a triple-quoted string with explicit newlines
+        # Use a single triple-quoted string with .format() to avoid concatenation issues
         prompt = """Generate improved Python code based on this current iteration:
 ```python
-""" + base_code + """
+{base_code}
