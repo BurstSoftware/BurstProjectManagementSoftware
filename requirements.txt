@@ -1,6 +1,6 @@
-streamlit==1.32.0
+streamlit==1.25.0
 streamlit-ace==0.1.1
-reportlab==4.0.9
+reportlab==3.16.12
 google-generativeai==0.3.2
 streamlit-extras==0.3.5
 streamlit-option-menu==0.3.6
