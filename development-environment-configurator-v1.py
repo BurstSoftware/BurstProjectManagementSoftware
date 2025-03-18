@@ -99,6 +99,8 @@ def generate_codebase():
             framework_import += "\nfrom tkinter import ttk" # Optional, but often used
         elif framework.lower() == "pygame":
             framework_import = "import pygame"
+        elif framework.lower() == "customtkinter":
+            framework_import = "import customtkinter"
         # Add more framework imports here as needed
 
         code += f"""
@@ -114,7 +116,7 @@ FRAMEWORK = '{framework}'
 
 # {app_name_version if app_name_version else "Generated App"}
 
-# Features from Iteration #{i+1}
+# Iteration #{i+1}  # Changed here
 """
         for line in content.split('\n')[1:]:
             if line.strip():
@@ -137,6 +139,8 @@ def generate_codebase_for_ai():
             framework_import += "\nfrom tkinter import ttk" # Optional, but often used
         elif framework.lower() == "pygame":
             framework_import = "import pygame"
+        elif framework.lower() == "customtkinter":
+            framework_import = "import customtkinter"
         # Add more framework imports here as needed
 
         code += f"""
@@ -146,7 +150,7 @@ def generate_codebase_for_ai():
 
 # {app_name_version if app_name_version else "Generated App"}
 
-# Features from Iteration #{i+1}  # Changed here
+# Iteration #{i+1}  # Changed here
 """
         for line in content.split('\n')[1:]:
             if line.strip():
@@ -162,7 +166,7 @@ def generate_code_with_ai(api_key, codebase, interpreter, framework):
         model = genai.GenerativeModel('gemini-1.5-pro-latest')
         prompt = f"""
         You are a helpful AI assistant that helps to generate python code for applications based on the following codebase,
-        and adds implementation details with comments.  The app name and version are defined in the first comment of the codebase.  The code should use {interpreter} and the {framework} framework.
+        and adds implementation details with comments.  The app name and version are defined in the first comment of the codebase.  The code should use {interpreter} and the {framework} framework.  Refer to the feature set with only the term Iteration and the iteration number: (Iteration #1).
 
         Codebase:
         ```python
