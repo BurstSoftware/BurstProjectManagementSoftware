@@ -120,8 +120,6 @@ def generate_codebase():
 # IDE: {ide}
 # Framework: {framework}
 
-import streamlit as st
-
 # Current Iteration
 """
     for line in current_iteration.split('\n')[1:]:  # Skip the #AppName line
