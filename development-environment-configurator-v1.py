@@ -26,6 +26,7 @@ with col1:
 with col2:
     ide = st.text_input("IDE/Text Editor", "VS Code")
     framework = st.text_input("Framework", "Streamlit")  # Allow any framework to be entered
+    feature_description = st.text_input("Feature Description", "A brief description of the app's feature")  # Added feature description
 
 # Google AI Studio API Key input
 google_api_key = st.text_input("Google AI Studio API Key", type="password")
@@ -45,11 +46,11 @@ def create_reportlab_gui(index):
 
     return content
 
-# Add new ReportLab instance
-if st.button("Add New Iteration"): # changed button text
+# Add new Iteration instance
+if st.button("Add New Iteration"):
     st.session_state.reportlab_instances.append("")
 
-# Display existing ReportLab instances
+# Display existing Iteration instances
 for i in range(len(st.session_state.reportlab_instances)):
     st.session_state.reportlab_instances[i] = create_reportlab_gui(i)
 
@@ -63,6 +64,7 @@ def generate_pdf():
     c.drawString(100, height - 70, f"Interpreter: {interpreter}")
     c.drawString(100, height - 90, f"IDE: {ide}")
     c.drawString(100, height - 110, f"Framework: {framework}")
+    c.drawString(100, height - 130, f"Feature Description: {feature_description}")  # Added feature description
 
     y_position = height - 150
     for i, content in enumerate(st.session_state.reportlab_instances):
@@ -109,12 +111,13 @@ VERSION = '{app_version}'
 INTERPRETER = '{interpreter}'
 IDE = '{ide}'
 FRAMEWORK = '{framework}'
+FEATURE_DESCRIPTION = '{feature_description}' # Added Feature Description
 
 {framework_import}
 
 # {app_name_version if app_name_version else "Generated App"}
 
-# Features from Iteration #{i+1} # Changed here
+# Features from Iteration #{i+1}
 """
         for line in content.split('\n')[1:]:
             if line.strip():
@@ -169,7 +172,7 @@ def generate_code_with_ai(api_key, codebase, interpreter, framework):
         {codebase}
         ```
 
-        Generate the fully implemented code base. Add comments to explain the code.  Make sure the initial comment (app name and version) is preserved. Do not include VERSION, INTERPRETER, IDE, or FRAMEWORK in the code base since the user already specified this in the config. Ensure that the import statement matches the specified framework.
+        Generate the fully implemented code base. Add comments to explain the code.  Make sure the initial comment (app name and version) is preserved. Do not include VERSION, INTERPRETER, IDE, FRAMEWORK, or FEATURE_DESCRIPTION in the code base since the user already specified this in the config. Ensure that the import statement matches the specified framework.
         """
 
         response = model.generate_content(prompt)
@@ -193,7 +196,7 @@ if st.button("Export to PDF"):
         except Exception as e:
             st.error(f"PDF generation failed: {str(e)}")
     else:
-        st.warning("Please add at least one iteration first")  # Changed here
+        st.warning("Please add at least one iteration first")
 
 # Generate and display codebase
 if st.button("Generate Codebase"):
@@ -206,7 +209,7 @@ if st.button("Generate Codebase"):
             st.error(f"Code generation failed: {str(e)}")
             traceback.print_exc()
     else:
-        st.warning("Please add at least one iteration first") # Changed here
+        st.warning("Please add at least one iteration first")
 
 # AI Code Generation Button
 if st.button("Generate Code with AI"):
@@ -220,7 +223,7 @@ if st.button("Generate Code with AI"):
 
                 # Add AI-generated code as a new ReportLab instance
                 st.session_state.reportlab_instances.append(f"# AI Generated Codebase\n{ai_generated_code}")
-                st.success("AI-generated codebase added as a new iteration.") # Changed here
+                st.success("AI-generated codebase added as a new iteration.")
         except Exception as e:
             st.error(f"AI code generation failed: {str(e)}")
             traceback.print_exc()
@@ -240,4 +243,5 @@ st.sidebar.write("""
 7. Click "Generate Code with AI" to enhance the codebase using Google AI Studio. The (Interpreter and Framework) and (Ideas/Notes) will be sent to the AI to create the app. The other inputs will be saved to the application.
 8. Export to PDF when ready
 9. The generated import statement depends on the value set for Framework (e.g., Streamlit, Tkinter, Pygame).
+10. **Feature Description:**  Enter a brief description of the app's feature in the designated field.  This will *not* be passed to the AI, but will be included in the configuration for documentation.
 """)
