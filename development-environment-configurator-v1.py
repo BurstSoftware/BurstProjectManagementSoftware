@@ -14,6 +14,11 @@ if 'reportlab_instances' not in st.session_state:
     st.session_state.reportlab_instances = []
 if 'generated_code' not in st.session_state:
     st.session_state.generated_code = ""
+if 'ai_generated_code_list' not in st.session_state:
+    st.session_state.ai_generated_code_list = [] # store AI-Generated Code
+if 'show_ai_generated_code' not in st.session_state:
+    st.session_state.show_ai_generated_code = False
+
 
 # Main app title
 st.title("Development Environment Configurator")
@@ -204,13 +209,28 @@ if st.button("Generate Codebase"):
     if st.session_state.reportlab_instances:
         try:
             st.session_state.generated_code = generate_codebase()
-            st.subheader("Generated Codebase")
-            st.code(st.session_state.generated_code, language="python")
         except Exception as e:
             st.error(f"Code generation failed: {str(e)}")
             traceback.print_exc()
     else:
         st.warning("Please add at least one iteration first")
+
+
+# Function to display AI generated code with a delete button
+def display_ai_generated_code(code, index):
+    col1, col2 = st.columns([0.8, 0.2])  # Adjust column widths as needed
+    with col1:
+        st.subheader(f"AI Generated Codebase #{index + 1}")
+        st.code(code, language="python")
+    with col2:
+        if st.button("Delete", key=f"delete_{index}"):
+            del st.session_state.ai_generated_code_list[index]
+            st.experimental_rerun()
+
+# Display all generated code with delete buttons
+if st.session_state.ai_generated_code_list:
+    for index, code in enumerate(st.session_state.ai_generated_code_list):
+       display_ai_generated_code(code, index)
 
 # AI Code Generation Button
 if st.button("Generate Code with AI"):
@@ -219,17 +239,15 @@ if st.button("Generate Code with AI"):
             codebase_for_ai = generate_codebase_for_ai()
             ai_generated_code = generate_code_with_ai(google_api_key, codebase_for_ai, interpreter, framework)
             if ai_generated_code:
-                st.subheader("AI Generated Codebase")
-                st.code(ai_generated_code, language="python")
+                st.session_state.ai_generated_code_list.append(ai_generated_code)
+                st.success("AI-generated codebase added.") # Remove what AI code
 
-                # Add AI-generated code as a new ReportLab instance
-                st.session_state.reportlab_instances.append(f"# AI Generated Codebase\n{ai_generated_code}")
-                st.success("AI-generated codebase added as a new iteration.")
         except Exception as e:
             st.error(f"AI code generation failed: {str(e)}")
             traceback.print_exc()
     else:
         st.warning("Please generate the initial codebase and/or enter API Key first.")
+
 
 
 # Instructions
@@ -241,7 +259,9 @@ st.sidebar.write("""
 4. In each iteration, the *first* line (starting with #) will be used as the application name and version.  If no first line is provided, it will default to Iteration #.
 5. Type ideas (following the first line).
 6. Generate the initial codebase.
-7. Click "Generate Code with AI" to enhance the codebase using Google AI Studio. The (Interpreter and Framework) and (Ideas/Notes) will be sent to the AI to create the app. The other inputs will be saved to the application.
-8. Export to PDF when ready
-9. The generated import statement depends on the value set for Framework (e.g., Streamlit, Tkinter, Pygame).
+7. Click "Generate Code with AI" to enhance the codebase using Google AI Studio. The (Interpreter and Framework) and (Ideas/Notes) will be sent to the AI to create the app. The generated code will be displayed.
+8. You can delete any of the generated code
+9. You can copy the generated code and use it in iterations
+10. Export to PDF when ready
+11. The generated import statement depends on the value set for Framework (e.g., Streamlit, Tkinter, Pygame).
 """)
