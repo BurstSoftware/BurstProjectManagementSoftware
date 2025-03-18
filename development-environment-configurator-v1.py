@@ -225,7 +225,8 @@ def display_ai_generated_code(code, index):
     with col2:
         if st.button("Delete AI Code", key=f"delete_ai_{index}"):
             del st.session_state.ai_generated_code_list[index]
-            st.experimental_rerun()
+            #st.experimental_rerun() #This will fail if st.experimental_rerun is not allowed
+            st.rerun()
 
 # AI Code Generation Button
 if st.button("Generate Code with AI"):
@@ -254,7 +255,8 @@ if st.button("Generate Code with AI"):
                 framework = ""
 
                 st.session_state.ai_generated_code_list.append(ai_generated_code) # append to AI code list
-                st.experimental_rerun()
+                #st.experimental_rerun() #This will fail if st.experimental_rerun is not allowed
+                st.rerun()
         except Exception as e:
             st.error(f"AI code generation failed: {str(e)}")
             traceback.print_exc()
