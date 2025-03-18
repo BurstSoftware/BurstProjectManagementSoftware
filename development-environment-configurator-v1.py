@@ -2,18 +2,12 @@ import streamlit as st
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import io
-import speech_recognition as sr
-import sounddevice as sd
-import numpy as np
+
 from datetime import datetime
 import traceback
 
-# Check if running locally (for voice input support)
-try:
-    import sounddevice
-    LOCAL_ENV = True
-except ImportError:
-    LOCAL_ENV = False
+
+LOCAL_ENV = False # Changed to always False
 
 # Initialize session state
 if 'reportlab_instances' not in st.session_state:
@@ -36,30 +30,6 @@ with col2:
 # Google AI Studio API Key input
 google_api_key = st.text_input("Google AI Studio API Key", type="password")
 
-# Voice to text function (local only)
-def voice_to_text():
-    if not LOCAL_ENV:
-        return "Voice input is only available in local environments."
-    
-    try:
-        # Record audio using sounddevice
-        st.info("Recording... Speak now! (5 seconds)")
-        duration = 5  # seconds
-        fs = 44100  # Sample rate
-        recording = sd.rec(int(duration * fs), samplerate=fs, channels=1, dtype='int16')
-        sd.wait()  # Wait for recording to finish
-        
-        # Convert to WAV-like format for speech_recognition
-        audio_data = np.frombuffer(recording.tobytes(), dtype=np.int16)
-        
-        # Use speech_recognition to process audio
-        r = sr.Recognizer()
-        audio = sr.AudioData(audio_data.tobytes(), fs, 2)  # 2 bytes per sample
-        text = r.recognize_google(audio)
-        return text
-    except Exception as e:
-        return f"Voice recognition failed: {str(e)}"
-
 # ReportLab GUI component
 def create_reportlab_gui(index):
     st.subheader(f"ReportLab Instance #{index + 1}")
@@ -71,30 +41,8 @@ def create_reportlab_gui(index):
         key=f"reportlab_{index}"
     )
     
-    # Voice input (local) or file upload (cloud fallback)
-    if LOCAL_ENV:
-        if st.button("Voice Input", key=f"voice_{index}"):
-            voice_text = voice_to_text()
-            if not voice_text.startswith("Voice recognition failed"):
-                content = f"# {voice_text}"
-                st.session_state[f"reportlab_{index}"] = content
-            else:
-                st.error(voice_text)
-    else:
-        st.info("Voice input unavailable in cloud. Upload an audio file instead.")
-        audio_file = st.file_uploader(f"Upload WAV file for Instance #{index + 1}", type=["wav"], key=f"audio_{index}")
-        if audio_file:
-            try:
-                r = sr.Recognizer()
-                with sr.AudioFile(audio_file) as source:
-                    audio = r.record(source)
-                    voice_text = r.recognize_google(audio)
-                    content = f"# {voice_text}"
-                    st.session_state[f"reportlab_{index}"] = content
-                    st.success("Audio processed successfully")
-            except Exception as e:
-                st.error(f"Audio processing failed: {str(e)}")
-    
+    st.info("Voice input is disabled. Please type your ideas/notes.")
+
     return content
 
 # Add new ReportLab instance
@@ -193,7 +141,7 @@ st.sidebar.write("""
 1. Enter app configuration details
 2. Input Google AI Studio API Key (optional)
 3. Add ReportLab instances using the button
-4. Type ideas or use voice input (local) / upload WAV (cloud)
+4. Type ideas
 5. Export to PDF when ready
 6. Generate codebase from your ideas
 """)
