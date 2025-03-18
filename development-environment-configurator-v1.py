@@ -104,7 +104,7 @@ def generate_codebase():
         # Add more framework imports here as needed
 
         code += f"""
-# {'#' if app_name_version else ''} {app_name_version if app_name_version else f"Iteration {i+1}"}  # Changed here
+# {'#' if app_name_version else ''} {app_name_version if app_name_version else f"Iteration {i+1}"}
 # App Configuration (based on user input)
 # The configuration below is NOT passed to the AI. It is just for documentation.
 VERSION = '{app_version}'
@@ -116,7 +116,7 @@ FRAMEWORK = '{framework}'
 
 # {app_name_version if app_name_version else "Generated App"}
 
-# Iteration #{i+1}  # Changed here
+# Iteration #{i+1}
 """
         for line in content.split('\n')[1:]:
             if line.strip():
@@ -144,13 +144,13 @@ def generate_codebase_for_ai():
         # Add more framework imports here as needed
 
         code += f"""
-# {'#' if app_name_version else ''} {app_name_version if app_name_version else f"Iteration {i+1}"}  # Changed here
+# {'#' if app_name_version else ''} {app_name_version if app_name_version else f"Iteration {i+1}"}
 
 {framework_import}
 
 # {app_name_version if app_name_version else "Generated App"}
 
-# Iteration #{i+1}  # Changed here
+# Iteration #{i+1}
 """
         for line in content.split('\n')[1:]:
             if line.strip():
