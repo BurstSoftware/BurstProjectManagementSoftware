@@ -225,8 +225,76 @@ def display_ai_generated_code(code, index):
     with col2:
         if st.button("Delete AI Code", key=f"delete_ai_{index}"):
             del st.session_state.ai_generated_code_list[index]
-            #st.experimental_rerun() #This will fail if st.experimental_rerun is not allowed
+
+            # Regenerate AI code based on the updated iterations
+            regenerate_ai_code()
             st.rerun()
+
+def regenerate_ai_code():
+    """Regenerates AI code for all iterations based on the current state."""
+    st.session_state.ai_generated_code_list = []  # Clear existing AI code
+
+    for i in range(len(st.session_state.saved_iterations)):  # Iterate through saved iterations
+        iteration = st.session_state.saved_iterations[i]
+
+        # Temporarily set app configuration to the saved iteration's values
+        temp_app_version = iteration['App Version']
+        temp_interpreter = iteration['Interpreter']
+        temp_ide = iteration['IDE/Text Editor']
+        temp_framework = iteration['Framework']
+        temp_reportlab_instances = iteration['Iterations']
+
+        # Generate a temporary codebase based on the saved iteration's data
+        temp_codebase = generate_codebase_for_ai_specific(temp_reportlab_instances, temp_interpreter, temp_framework)  # Using a tailored code generation function
+
+        # Generate AI code using the temporary codebase and configuration
+        ai_generated_code = generate_code_with_ai(google_api_key, temp_codebase, temp_interpreter, temp_framework)
+
+        if ai_generated_code:
+            st.session_state.ai_generated_code_list.append(ai_generated_code)
+        else:
+            st.error(f"Failed to regenerate AI code for iteration {i + 1}.")
+
+    # Restore the current app configuration.  The current reportlab_instances will be empty.
+    #app_version = temp_app_version  #this is not needed since this is a local variable within this script
+    #interpreter = temp_interpreter  #this is not needed since this is a local variable within this script
+    #ide = temp_ide #this is not needed since this is a local variable within this script
+    #framework = temp_framework #this is not needed since this is a local variable within this script
+    #st.session_state.reportlab_instances = temp_reportlab_instances #this is not needed since regenerate is called when the ai code is deleted
+
+def generate_codebase_for_ai_specific(reportlab_instances, interpreter, framework):
+    code = ""
+    for i, content in enumerate(reportlab_instances):
+        # Extract the first line (the app name and version if specified)
+        first_line = content.split('\n')[0].strip()
+        app_name_version = first_line[1:].strip()  # Remove the initial '#' and leading/trailing spaces
+
+        framework_import = ""
+        if framework.lower() == "streamlit":
+            framework_import = "import streamlit as st"
+        elif framework.lower() == "tkinter":
+            framework_import = "import tkinter as tk"
+            framework_import += "\nfrom tkinter import ttk" # Optional, but often used
+        elif framework.lower() == "pygame":
+            framework_import = "import pygame"
+        elif framework.lower() == "customtkinter":
+            framework_import = "import customtkinter"
+        # Add more framework imports here as needed
+
+        code += f"""
+# {'#' if app_name_version else ''} {app_name_version if app_name_version else f"Iteration {i+1}"}
+
+{framework_import}
+
+# {app_name_version if app_name_version else "Generated App"}
+
+# Iteration #{i+1}
+"""
+        for line in content.split('\n')[1:]:
+            if line.strip():
+                code += f"#st.write('{line.strip()}')\n" #Commented out for all cases since framework is variable
+    return code
+
 
 # AI Code Generation Button
 if st.button("Generate Code with AI"):
@@ -255,7 +323,6 @@ if st.button("Generate Code with AI"):
                 framework = ""
 
                 st.session_state.ai_generated_code_list.append(ai_generated_code) # append to AI code list
-                #st.experimental_rerun() #This will fail if st.experimental_rerun is not allowed
                 st.rerun()
         except Exception as e:
             st.error(f"AI code generation failed: {str(e)}")
