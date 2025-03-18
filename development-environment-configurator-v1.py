@@ -32,7 +32,7 @@ google_api_key = st.text_input("Google AI Studio API Key", type="password")
 
 # ReportLab GUI component
 def create_reportlab_gui(index):
-    st.subheader(f"ReportLab Instance #{index + 1}")
+    st.subheader(f"Iteration #{index + 1}")  # Changed from ReportLab Instance to Iteration
 
     # Display hash symbol and input area
     content = st.text_area(
@@ -46,7 +46,7 @@ def create_reportlab_gui(index):
     return content
 
 # Add new ReportLab instance
-if st.button("Add New ReportLab Instance"):
+if st.button("Add New Iteration"): # changed button text
     st.session_state.reportlab_instances.append("")
 
 # Display existing ReportLab instances
@@ -69,7 +69,7 @@ def generate_pdf():
         if y_position < 50:
             c.showPage()
             y_position = height - 50
-        c.drawString(100, y_position, f"Instance #{i + 1}:")
+        c.drawString(100, y_position, f"Iteration #{i + 1}:") # changed here too
         y_position -= 20
         for line in content.split('\n'):
             if y_position < 50:
@@ -102,7 +102,7 @@ def generate_codebase():
         # Add more framework imports here as needed
 
         code += f"""
-# {'#' if app_name_version else ''} {app_name_version if app_name_version else f"ReportLab Instance {i+1}"}
+# {'#' if app_name_version else ''} {app_name_version if app_name_version else f"Iteration {i+1}"}  # Changed here
 # App Configuration (based on user input)
 # The configuration below is NOT passed to the AI. It is just for documentation.
 VERSION = '{app_version}'
@@ -114,7 +114,7 @@ FRAMEWORK = '{framework}'
 
 # {app_name_version if app_name_version else "Generated App"}
 
-# Features from ReportLab instance #{i+1}
+# Features from Iteration #{i+1} # Changed here
 """
         for line in content.split('\n')[1:]:
             if line.strip():
@@ -140,13 +140,13 @@ def generate_codebase_for_ai():
         # Add more framework imports here as needed
 
         code += f"""
-# {'#' if app_name_version else ''} {app_name_version if app_name_version else f"ReportLab Instance {i+1}"}
+# {'#' if app_name_version else ''} {app_name_version if app_name_version else f"Iteration {i+1}"}  # Changed here
 
 {framework_import}
 
 # {app_name_version if app_name_version else "Generated App"}
 
-# Features from ReportLab instance #{i+1}
+# Features from Iteration #{i+1}  # Changed here
 """
         for line in content.split('\n')[1:]:
             if line.strip():
@@ -193,7 +193,7 @@ if st.button("Export to PDF"):
         except Exception as e:
             st.error(f"PDF generation failed: {str(e)}")
     else:
-        st.warning("Please add at least one ReportLab instance first")
+        st.warning("Please add at least one iteration first")  # Changed here
 
 # Generate and display codebase
 if st.button("Generate Codebase"):
@@ -206,7 +206,7 @@ if st.button("Generate Codebase"):
             st.error(f"Code generation failed: {str(e)}")
             traceback.print_exc()
     else:
-        st.warning("Please add at least one ReportLab instance first")
+        st.warning("Please add at least one iteration first") # Changed here
 
 # AI Code Generation Button
 if st.button("Generate Code with AI"):
@@ -220,7 +220,7 @@ if st.button("Generate Code with AI"):
 
                 # Add AI-generated code as a new ReportLab instance
                 st.session_state.reportlab_instances.append(f"# AI Generated Codebase\n{ai_generated_code}")
-                st.success("AI-generated codebase added as a new ReportLab instance.")
+                st.success("AI-generated codebase added as a new iteration.") # Changed here
         except Exception as e:
             st.error(f"AI code generation failed: {str(e)}")
             traceback.print_exc()
@@ -233,8 +233,8 @@ st.sidebar.header("Instructions")
 st.sidebar.write("""
 1. Enter app configuration details
 2. Input Google AI Studio API Key (optional)
-3. Add ReportLab instances using the button
-4. In each instance, the *first* line (starting with #) will be used as the application name and version.  If no first line is provided, it will default to ReportLab Instance #.
+3. Add iterations using the button
+4. In each iteration, the *first* line (starting with #) will be used as the application name and version.  If no first line is provided, it will default to Iteration #.
 5. Type ideas (following the first line).
 6. Generate the initial codebase.
 7. Click "Generate Code with AI" to enhance the codebase using Google AI Studio. The (Interpreter and Framework) and (Ideas/Notes) will be sent to the AI to create the app. The other inputs will be saved to the application.
