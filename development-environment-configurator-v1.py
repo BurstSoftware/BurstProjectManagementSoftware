@@ -2,7 +2,6 @@ import streamlit as st
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import io
-import speech_recognition as sr
 from datetime import datetime
 
 # Initialize session state
@@ -26,18 +25,6 @@ with col2:
 # Google AI Studio API Key input
 google_api_key = st.text_input("Google AI Studio API Key", type="password")
 
-# Voice to text function
-def voice_to_text():
-    r = sr.Recognizer()
-    with sr.Microphone() as source:
-        st.info("Listening... Speak now!")
-        audio = r.listen(source)
-        try:
-            text = r.recognize_google(audio)
-            return text
-        except:
-            return "Could not recognize speech"
-
 # ReportLab GUI component
 def create_reportlab_gui(index):
     st.subheader(f"ReportLab Instance #{index + 1}")
@@ -49,14 +36,8 @@ def create_reportlab_gui(index):
         key=f"reportlab_{index}"
     )
     
-    # Voice to text button
-    if st.button("Voice Input", key=f"voice_{index}"):
-        voice_text = voice_to_text()
-        if voice_text != "Could not recognize speech":
-            content = f"# {voice_text}"
-            st.session_state[f"reportlab_{index}"] = content
-        else:
-            st.error("Speech recognition failed")
+    # Voice input removed for cloud compatibility
+    st.info("Voice input is available only in local environments with microphone support.")
     
     return content
 
@@ -80,13 +61,19 @@ def generate_pdf():
     c.drawString(100, height - 90, f"IDE: {ide}")
     c.drawString(100, height - 110, f"Framework: {framework}")
     
-    # Add ReportLab instances content
+    # Add ReportLab instances content with overflow handling
     y_position = height - 150
     for i, content in enumerate(st.session_state.reportlab_instances):
+        if y_position < 50:  # Check for page overflow
+            c.showPage()
+            y_position = height - 50
         c.drawString(100, y_position, f"Instance #{i + 1}:")
         y_position -= 20
         for line in content.split('\n'):
-            c.drawString(120, y_position, line)
+            if y_position < 50:
+                c.showPage()
+                y_position = height - 50
+            c.drawString(120, y_position, line[:80])  # Truncate long lines
             y_position -= 15
         y_position -= 20
     
@@ -121,26 +108,32 @@ st.title('Generated App')
 # Export to PDF button
 if st.button("Export to PDF"):
     if st.session_state.reportlab_instances:
-        pdf_buffer = generate_pdf()
-        st.download_button(
-            label="Download PDF",
-            data=pdf_buffer,
-            file_name=f"app_config_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-            mime="application/pdf"
-        )
+        try:
+            pdf_buffer = generate_pdf()
+            st.download_button(
+                label="Download PDF",
+                data=pdf_buffer,
+                file_name=f"app_config_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                mime="application/pdf"
+            )
+        except Exception as e:
+            st.error(f"PDF generation failed: {str(e)}")
     else:
         st.warning("Please add at least one ReportLab instance first")
 
 # Generate and display codebase
 if st.button("Generate Codebase"):
     if st.session_state.reportlab_instances:
-        st.session_state.generated_code = generate_codebase()
-        st.subheader("Generated Codebase")
-        st.code(st.session_state.generated_code, language="python")
-        
-        # Add to new ReportLab instance
-        st.session_state.reportlab_instances.append(f"# Generated Codebase\n{st.session_state.generated_code}")
-        st.success("Codebase added as new ReportLab instance")
+        try:
+            st.session_state.generated_code = generate_codebase()
+            st.subheader("Generated Codebase")
+            st.code(st.session_state.generated_code, language="python")
+            
+            # Add to new ReportLab instance
+            st.session_state.reportlab_instances.append(f"# Generated Codebase\n{st.session_state.generated_code}")
+            st.success("Codebase added as new ReportLab instance")
+        except Exception as e:
+            st.error(f"Code generation failed: {str(e)}")
     else:
         st.warning("Please add at least one ReportLab instance first")
 
@@ -148,9 +141,10 @@ if st.button("Generate Codebase"):
 st.sidebar.header("Instructions")
 st.sidebar.write("""
 1. Enter app configuration details
-2. Input Google AI Studio API Key
+2. Input Google AI Studio API Key (optional)
 3. Add ReportLab instances using the button
-4. Type ideas or use voice input
+4. Type ideas in the text areas
 5. Export to PDF when ready
 6. Generate codebase from your ideas
+Note: Voice input is disabled in cloud deployments.
 """)
