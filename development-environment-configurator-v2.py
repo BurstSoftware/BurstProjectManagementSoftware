@@ -124,68 +124,7 @@ def generate_ai_code(api_key):
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-pro-latest')
         base_code = generate_codebase()
-        # Use regular string concatenation instead of f-string with backslashes
-        prompt = (
-            "Generate improved Python code based on this current iteration:\n"
-            "```python\n" +
-            base_code +
-            "\n```\n" +
-            f"Use {framework} framework and add detailed comments. Preserve the app name from the first line: {current_iteration.split('\n')[0]}"
-        )
-        response = model.generate_content(prompt)
-        return response.text
-    except Exception as e:
-        st.error(f"AI generation failed: {str(e)}")
-        return None
-
-# Handle button actions
-if export_pdf:
-    if st.session_state.iteration_history or current_iteration.strip():
-        pdf_buffer = generate_pdf()
-        st.download_button(
-            "Download PDF",
-            pdf_buffer,
-            f"iterations_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-            "application/pdf"
-        )
-    else:
-        st.warning("Add some content first!")
-
-if generate_code and current_iteration.strip():
-    code = generate_codebase()
-    st.subheader("Generated Code (Current Iteration)")
-    st.code(code, language="python")
-
-if generate_ai and current_iteration.strip() and google_api_key:
-    ai_code = generate_ai_code(google_api_key)
-    if ai_code:
-        st.session_state.ai_generated_code.append(ai_code)
-        st.subheader("AI Generated Code (Current Iteration)")
-        st.code(ai_code, language="python")
-
-# Display iteration history
-if st.session_state.iteration_history:
-    st.header("Iteration History")
-    for i, iteration in enumerate(st.session_state.iteration_history):
-        with st.expander(f"Iteration #{i + 1}"):
-            st.text_area(f"Iteration #{i + 1}", iteration, disabled=True)
-            if st.button("Load to Current", key=f"load_{i}"):
-                st.session_state.current_iteration = iteration
-                st.rerun()
-
-# Display AI generated codes
-if st.session_state.ai_generated_code:
-    st.header("AI Generated Versions")
-    for i, code in enumerate(st.session_state.ai_generated_code):
-        with st.expander(f"AI Version #{i + 1}"):
-            st.code(code, language="python")
-            if st.button("Delete", key=f"delete_{i}"):
-                st.session_state.ai_generated_code.pop(i)
-                st.rerun()
-
-# Clear everything
-if st.button("Clear All"):
-    st.session_state.iteration_history = []
-    st.session_state.current_iteration = ""
-    st.session_state.ai_generated_code = []
-    st.rerun()
+        # Use a triple-quoted string with explicit newlines
+        prompt = """Generate improved Python code based on this current iteration:
+```python
+""" + base_code + """
