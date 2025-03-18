@@ -51,7 +51,8 @@ with col4:
 # Save current iteration to history
 if save_iteration and current_iteration.strip():
     st.session_state.iteration_history.append(current_iteration)
-    st.session_state.current_iteration = current_iteration  # Update session state
+    # Removed: st.session_state.current_iteration = current_iteration
+    # The widget already updates st.session_state.current_iteration via the key
     st.session_state.reset_trigger = False  # Ensure reset flag is off
     st.rerun()
 
