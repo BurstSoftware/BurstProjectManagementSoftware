@@ -13,7 +13,9 @@ if 'current_iteration' not in st.session_state:
 if 'ai_generated_code' not in st.session_state:
     st.session_state.ai_generated_code = []  # AI-generated versions
 if 'reset_trigger' not in st.session_state:
-    st.session_state.reset_trigger = False  # Flag to trigger reset
+    st.session_state.reset_trigger = False  # Flag to trigger full reset
+if 'clear_iteration_trigger' not in st.session_state:
+    st.session_state.clear_iteration_trigger = False  # Flag to trigger clearing current iteration
 
 # Main app title
 st.title("Iterative Code Generator")
@@ -33,12 +35,13 @@ with st.expander("Configuration", expanded=True):
 st.header("Current Iteration")
 current_iteration = st.text_area(
     "Current Iteration (starts with # for app name)",
-    value=st.session_state.current_iteration if not st.session_state.reset_trigger else "# MyApp",
+    value=("" if st.session_state.clear_iteration_trigger else 
+           st.session_state.current_iteration if not st.session_state.reset_trigger else "# MyApp"),
     key="current_iteration"
 )
 
 # Action buttons
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
     save_iteration = st.button("Save Iteration")
 with col2:
@@ -47,13 +50,19 @@ with col3:
     generate_code = st.button("Generate Code")
 with col4:
     generate_ai = st.button("Generate AI Code")
+with col5:
+    clear_iteration = st.button("Clear Current Iteration")
 
 # Save current iteration to history
 if save_iteration and current_iteration.strip():
     st.session_state.iteration_history.append(current_iteration)
-    # Removed: st.session_state.current_iteration = current_iteration
-    # The widget already updates st.session_state.current_iteration via the key
     st.session_state.reset_trigger = False  # Ensure reset flag is off
+    st.session_state.clear_iteration_trigger = False  # Ensure clear flag is off
+    st.rerun()
+
+# Clear current iteration
+if clear_iteration:
+    st.session_state.clear_iteration_trigger = True
     st.rerun()
 
 # PDF generation
@@ -171,6 +180,7 @@ if st.session_state.iteration_history:
             if st.button("Load to Current", key=f"load_{i}"):
                 st.session_state.current_iteration = iteration
                 st.session_state.reset_trigger = False  # Ensure reset flag is off
+                st.session_state.clear_iteration_trigger = False  # Ensure clear flag is off
                 st.rerun()
 
 # Display AI generated codes
@@ -187,5 +197,6 @@ if st.session_state.ai_generated_code:
 if st.button("Clear All"):
     st.session_state.iteration_history = []
     st.session_state.ai_generated_code = []
-    st.session_state.reset_trigger = True  # Trigger reset of current_iteration
+    st.session_state.reset_trigger = True  # Trigger reset of current_iteration to default
+    st.session_state.clear_iteration_trigger = False  # Reset clear flag
     st.rerun()
