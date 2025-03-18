@@ -39,7 +39,7 @@ def create_reportlab_gui(index):
         key=f"reportlab_{index}"
     )
     
-    st.info("Voice input is disabled. Please type your ideas/notes.")
+    st.info("Please type your ideas/notes.")
 
     return content
 
