@@ -225,8 +225,25 @@ def display_ai_generated_code(code, index):
     with col2:
         if st.button("Delete AI Code", key=f"delete_ai_{index}"):
             del st.session_state.ai_generated_code_list[index]
+
+            #Renumber the AI Codebase list
+            renumber_ai_codebase_list()
+
             #st.experimental_rerun() #This will fail if st.experimental_rerun is not allowed
             st.rerun()
+
+#Renumber the AI Codebase list when an item is deleted
+def renumber_ai_codebase_list():
+    #No need to renumber the list if there are no generated AI Codebase
+    if not st.session_state.ai_generated_code_list:
+        return
+
+    temp_list = st.session_state.ai_generated_code_list
+
+    st.session_state.ai_generated_code_list = []
+
+    for index, code in enumerate(temp_list):
+         st.session_state.ai_generated_code_list.append(code)
 
 # AI Code Generation Button
 if st.button("Generate Code with AI"):
