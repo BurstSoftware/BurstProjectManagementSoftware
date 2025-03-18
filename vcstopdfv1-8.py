@@ -1,4 +1,4 @@
-​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​import streamlit as st
+import streamlit as st
 from io import BytesIO
 import base64
 from reportlab.lib.pagesizes import letter
@@ -73,11 +73,11 @@ with st.sidebar:
                 "text-align": "left",
                 "margin": "0px",
                 "--hover-color": "#eee",
-                "color": "black"  # Unselected items in black
+                "color": "black"
             },
             "nav-link-selected": {
                 "background-color": "green",
-                "color": "black",  # Selected item in black
+                "color": "black",
                 "font-weight": "bold"
             },
         }
@@ -93,7 +93,6 @@ if selected == "Project Setup":
         color_name="green-70",
     )
 
-    # API Key Input
     gemini_api_key = st.text_input("Enter your Gemini API Key:", type="password")
 
     col1, col2 = st.columns(2)
@@ -152,7 +151,6 @@ elif selected == "Code Analysis":
         if app_version and app_version in st.session_state.file_dict:
             gemini_api_key = st.text_input("Gemini API Key:", type="password")
 
-            # Voice input integration using Web Speech API
             st.subheader("Enter Prompt for Gemini AI")
             prompt_placeholder = "e.g., 'Optimize this code for performance'"
 
@@ -416,4 +414,3 @@ elif selected == "About":
         - For questions or feedback, contact [Your Name/Organization] at [Your Email Address].
         """
     )
-​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
