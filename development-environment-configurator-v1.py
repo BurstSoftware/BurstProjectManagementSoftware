@@ -211,7 +211,6 @@ if st.button("Generate Codebase"):
             st.session_state.generated_code = generate_codebase()
             st.subheader("Generated Codebase")
             st.code(st.session_state.generated_code, language="python")  # Display the generated code
-
         except Exception as e:
             st.error(f"Code generation failed: {str(e)}")
             traceback.print_exc()
@@ -225,14 +224,9 @@ def display_ai_generated_code(code, index):
         st.subheader(f"AI Generated Codebase #{index + 1}")
         st.code(code, language="python")
     with col2:
-        if st.button("Delete", key=f"delete_{index}"):
+        if st.button("Delete AI Code", key=f"delete_ai_{index}"):
             del st.session_state.ai_generated_code_list[index]
             st.experimental_rerun()
-
-# Display all generated code with delete buttons
-if st.session_state.ai_generated_code_list:
-    for index, code in enumerate(st.session_state.ai_generated_code_list):
-       display_ai_generated_code(code, index)
 
 # AI Code Generation Button
 if st.button("Generate Code with AI"):
@@ -247,6 +241,12 @@ if st.button("Generate Code with AI"):
             traceback.print_exc()
     else:
         st.warning("Please generate the initial codebase and/or enter API Key first.")
+
+
+# Display all generated code with delete buttons
+if st.session_state.ai_generated_code_list:
+    for index, code in enumerate(st.session_state.ai_generated_code_list):
+       display_ai_generated_code(code, index)
 
 # Instructions
 st.sidebar.header("Instructions")
