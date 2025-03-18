@@ -7,7 +7,7 @@ import traceback
 import os
 import google.generativeai as genai
 
-LOCAL_ENV = False # Changed to always False
+LOCAL_ENV = False  # Changed to always False
 
 # Initialize session state
 if 'reportlab_instances' not in st.session_state:
@@ -33,14 +33,14 @@ google_api_key = st.text_input("Google AI Studio API Key", type="password")
 # ReportLab GUI component
 def create_reportlab_gui(index):
     st.subheader(f"ReportLab Instance #{index + 1}")
-    
+
     # Display hash symbol and input area
     content = st.text_area(
-        f"Ideas/Notes (starts with #)", 
+        f"Ideas/Notes (starts with #)",
         value="# ",
         key=f"reportlab_{index}"
     )
-    
+
     st.info("Please type your ideas/notes.")
 
     return content
@@ -58,12 +58,12 @@ def generate_pdf():
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
-    
+
     c.drawString(100, height - 50, f"App Version: {app_version}")
     c.drawString(100, height - 70, f"Interpreter: {interpreter}")
     c.drawString(100, height - 90, f"IDE: {ide}")
     c.drawString(100, height - 110, f"Framework: {framework}")
-    
+
     y_position = height - 150
     for i, content in enumerate(st.session_state.reportlab_instances):
         if y_position < 50:
@@ -78,28 +78,33 @@ def generate_pdf():
             c.drawString(120, y_position, line[:80])
             y_position -= 15
         y_position -= 20
-    
+
     c.save()
     buffer.seek(0)
     return buffer
 
 # Generate codebase
 def generate_codebase():
-    code = f"""# Generated App Codebase - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    code = ""
+    for i, content in enumerate(st.session_state.reportlab_instances):
+        # Extract the first line (the app name and version if specified)
+        first_line = content.split('\n')[0].strip()
+        app_name_version = first_line[1:].strip()  # Remove the initial '#' and leading/trailing spaces
+
+        code += f"""
+# {'#' if app_name_version else ''} {app_name_version if app_name_version else f"ReportLab Instance {i+1}"}
 import streamlit as st
 
-# App Configuration
+# App Configuration (based on user input)
 VERSION = '{app_version}'
 INTERPRETER = '{interpreter}'
 IDE = '{ide}'
 FRAMEWORK = '{framework}'
 
-st.title('Generated App')
+st.title('{app_name_version if app_name_version else "Generated App"}')
 
-# Features from ReportLab instances
+# Features from ReportLab instance #{i+1}
 """
-    for i, content in enumerate(st.session_state.reportlab_instances):
-        code += f"\n# Features from Instance #{i + 1}\n"
         for line in content.split('\n')[1:]:
             if line.strip():
                 code += f"st.write('{line.strip()}')\n"
@@ -114,7 +119,7 @@ def generate_code_with_ai(api_key, codebase):
         model = genai.GenerativeModel('gemini-1.5-pro-latest')
         prompt = f"""
         You are a helpful AI assistant that helps to generate python code for streamlit applications based on the following codebase,
-        and adds implementation details with comments.
+        and adds implementation details with comments.  The app name and version are defined in the first comment of the codebase. Use the specified python version and framework.
 
         Codebase:
         ```python
@@ -122,7 +127,7 @@ def generate_code_with_ai(api_key, codebase):
         ```
 
         Generate the fully implemented code base. Use streamlit to show the results and UI.
-        Add comments to explain the code.
+        Add comments to explain the code.  Make sure the initial comment (app name and version) is preserved.
         """
 
         response = model.generate_content(prompt)
@@ -155,13 +160,11 @@ if st.button("Generate Codebase"):
             st.session_state.generated_code = generate_codebase()
             st.subheader("Generated Codebase")
             st.code(st.session_state.generated_code, language="python")
-            # Removed: #st.session_state.reportlab_instances.append(f"# Generated Codebase\n{st.session_state.generated_code}")
-            # Removed: #st.success("Codebase added as new ReportLab instance")
         except Exception as e:
             st.error(f"Code generation failed: {str(e)}")
+            traceback.print_exc()
     else:
         st.warning("Please add at least one ReportLab instance first")
-
 
 # AI Code Generation Button
 if st.button("Generate Code with AI"):
@@ -177,7 +180,7 @@ if st.button("Generate Code with AI"):
                 st.success("AI-generated codebase added as a new ReportLab instance.")
         except Exception as e:
             st.error(f"AI code generation failed: {str(e)}")
-            traceback.print_exc() # Print the full traceback to the console
+            traceback.print_exc()
     elif not st.session_state.generated_code:
         st.warning("Please generate the initial codebase first.")
     elif not google_api_key:
@@ -189,8 +192,9 @@ st.sidebar.write("""
 1. Enter app configuration details
 2. Input Google AI Studio API Key (optional)
 3. Add ReportLab instances using the button
-4. Type ideas
-5. Generate the initial codebase.
-6. Click "Generate Code with AI" to enhance the codebase using Google AI Studio.
-7. Export to PDF when ready
+4. In each instance, the *first* line (starting with #) will be used as the application name and version.  If no first line is provided, it will default to ReportLab Instance #.
+5. Type ideas (following the first line).
+6. Generate the initial codebase.
+7. Click "Generate Code with AI" to enhance the codebase using Google AI Studio.
+8. Export to PDF when ready
 """)
