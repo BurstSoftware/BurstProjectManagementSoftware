@@ -2,10 +2,8 @@ import streamlit as st
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import io
-
 from datetime import datetime
 import traceback
-
 
 LOCAL_ENV = False # Changed to always False
 
