@@ -24,11 +24,11 @@ st.title("Burst Software AI Code Iterator")
 with st.expander("Configuration", expanded=True):
     col1, col2 = st.columns(2)
     with col1:
-        app_version = st.text_input("App Version", "1.0.0")
-        interpreter = st.text_input("Interpreter", "Python 3.9")
+        app_version = st.text_input("App Version", value="")
+        interpreter = st.text_input("Interpreter", value="")
     with col2:
-        ide = st.text_input("IDE", "VS Code")
-        framework = st.text_input("Framework", "Streamlit")
+        ide = st.text_input("IDE", value="")
+        framework = st.text_input("Framework", value="")
     google_api_key = st.text_input("Google AI API Key", type="password")
 
 # Current iteration input
@@ -56,8 +56,8 @@ with col5:
 # Save current iteration to history
 if save_iteration and current_iteration.strip():
     st.session_state.iteration_history.append(current_iteration)
-    st.session_state.reset_trigger = False  # Ensure reset flag is off
-    st.session_state.clear_iteration_trigger = False  # Ensure clear flag is off
+    st.session_state.reset_trigger = False
+    st.session_state.clear_iteration_trigger = False
     st.rerun()
 
 # Clear current iteration
@@ -72,13 +72,13 @@ def generate_pdf():
     width, height = letter
     
     y = height - 50
-    c.drawString(100, y, f"App Version: {app_version}")
+    c.drawString(100, y, f"App Version: {app_version if app_version else 'Not specified'}")
     y -= 20
-    c.drawString(100, y, f"Interpreter: {interpreter}")
+    c.drawString(100, y, f"Interpreter: {interpreter if interpreter else 'Not specified'}")
     y -= 20
-    c.drawString(100, y, f"IDE: {ide}")
+    c.drawString(100, y, f"IDE: {ide if ide else 'Not specified'}")
     y -= 20
-    c.drawString(100, y, f"Framework: {framework}")
+    c.drawString(100, y, f"Framework: {framework if framework else 'Not specified'}")
     y -= 40
     
     for i, content in enumerate(st.session_state.iteration_history):
@@ -115,16 +115,17 @@ def generate_pdf():
 def generate_codebase():
     code = f"""
 # App Configuration
-# Version: {app_version}
-# Interpreter: {interpreter}
-# IDE: {ide}
-# Framework: {framework}
+# Version: {app_version if app_version else 'Not specified'}
+# Interpreter: {interpreter if interpreter else 'Not specified'}
+# IDE: {ide if ide else 'Not specified'}
+# Framework: {framework if framework else 'Not specified'}
 
 # Current Iteration
 """
+    # Generic code output without framework assumption
     for line in current_iteration.split('\n')[1:]:  # Skip the #AppName line
         if line.strip():
-            code += f"st.write('{line.strip()}')\n"
+            code += f"# {line.strip()}\n"
     return code
 
 # AI code generation
@@ -133,11 +134,18 @@ def generate_ai_code(api_key):
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-pro-latest')
         base_code = generate_codebase()
-        prompt = "Generate improved Python code based on this current iteration:\n" + \
+        prompt = "Generate improved code based on this current iteration:\n" + \
                  "```python\n" + \
                  base_code + \
                  "\n```\n" + \
-                 "Use " + framework + " framework and add detailed comments. Preserve the app name from the first line: " + current_iteration.split('\n')[0]
+                 f"Use the following configuration:\n" + \
+                 f"- Framework: {framework if framework else 'Not specified'}\n" + \
+                 f"- Interpreter: {interpreter if interpreter else 'Not specified'}\n" + \
+                 f"- IDE: {ide if ide else 'Not specified'}\n" + \
+                 f"- Version: {app_version if app_version else 'Not specified'}\n" + \
+                 "Add detailed comments and preserve the app name from the first line: " + \
+                 current_iteration.split('\n')[0] + \
+                 "\nGenerate appropriate code based on the specified framework and interpreter."
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
@@ -177,8 +185,8 @@ if st.session_state.iteration_history:
             st.text_area(f"Iteration #{i + 1}", iteration, disabled=True)
             if st.button("Load to Current", key=f"load_{i}"):
                 st.session_state.current_iteration = iteration
-                st.session_state.reset_trigger = False  # Ensure reset flag is off
-                st.session_state.clear_iteration_trigger = False  # Ensure clear flag is off
+                st.session_state.reset_trigger = False
+                st.session_state.clear_iteration_trigger = False
                 st.rerun()
 
 # Display AI generated codes
@@ -195,6 +203,6 @@ if st.session_state.ai_generated_code:
 if st.button("Clear All"):
     st.session_state.iteration_history = []
     st.session_state.ai_generated_code = []
-    st.session_state.reset_trigger = True  # Trigger reset of current_iteration to default
-    st.session_state.clear_iteration_trigger = False  # Reset clear flag
+    st.session_state.reset_trigger = True
+    st.session_state.clear_iteration_trigger = False
     st.rerun()
