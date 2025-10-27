@@ -35,12 +35,12 @@ col1, col2 = st.columns(2)
 with col1:
     app_version = st.text_input("App Version:")
 with col2:
-    interpreter_version = st.text_input("Interpreter Version:", placeholder="e.g., Python 3.9.0, Node.js 16.0.0")
+    interpreter_version = st.text_input("Interpreter Version:", placeholder="e.g., Python 3.9.0, Node.js 16.0.0, Java 17, Kotlin 1.9.0")
 
 # Modules and Frameworks
 st.header("Modules and Frameworks")
 modules_input = st.text_area("Enter Modules/Frameworks (comma-separated):", 
-                           placeholder="e.g., React, Vue.js, Tailwind CSS, Bootstrap")
+                           placeholder="e.g., React, Vue.js, Tailwind CSS, Flutter, Spring, SwiftUI")
 if st.button("Save Modules/Frameworks"):
     if app_version and app_version not in st.session_state.task_list:
         st.session_state.task_list.append(app_version)
@@ -82,14 +82,47 @@ if app_version:
     if st.button("Add Another Code Section"):
         st.session_state.code_sections += 1
 
+    # Supported languages
+    supported_languages = [
+        "Python", "HTML", "CSS", "JavaScript", "Dart", "Java", "R", "Julia", 
+        "C", "C#", "C++", "Go", "Rust", "JSON", "XML", "Kotlin", "Scala", 
+        "Swift", "Fortran", "COBOL"
+    ]
+
     for i in range(st.session_state.code_sections):
         st.subheader(f"Code Section {i+1}")
-        code_type = st.selectbox(f"Select Code Type for Section {i+1}", 
-                                ["Python", "HTML", "CSS", "JavaScript"],
-                                key=f"code_type_{i}")
+        code_type = st.selectbox(
+            f"Select Code Type for Section {i+1}", 
+            supported_languages,
+            key=f"code_type_{i}"
+        )
         
+        # Map language names to ACE editor modes
+        language_mapping = {
+            "Python": "python",
+            "HTML": "html",
+            "CSS": "css",
+            "JavaScript": "javascript",
+            "Dart": "dart",
+            "Java": "java",
+            "R": "r",
+            "Julia": "julia",
+            "C": "c_cpp",
+            "C#": "csharp",
+            "C++": "c_cpp",
+            "Go": "golang",
+            "Rust": "rust",
+            "JSON": "json",
+            "XML": "xml",
+            "Kotlin": "kotlin",
+            "Scala": "scala",
+            "Swift": "swift",
+            "Fortran": "fortran",
+            "COBOL": "cobol"
+        }
+
         code = st_ace(
-            language=code_type.lower(),
+            language=language_mapping[code_type],
             theme="monokai",
             key=f"ace-editor-{i}",
             placeholder=f"Enter your {code_type} code here..."
@@ -130,7 +163,20 @@ for app_version in st.session_state.task_list:
         st.write("#### Code Sections:")
         for i, (code_type, code) in enumerate(st.session_state.code_dict[app_version]):
             st.write(f"{code_type} Code Section {i+1}:")
-            st.code(code, language=code_type.lower())
+            # Map to Streamlit language codes for display
+            display_language = {
+                "C#": "csharp",
+                "C++": "cpp",
+                "Go": "golang",
+                "JSON": "json",
+                "XML": "xml",
+                "Kotlin": "kotlin",
+                "Scala": "scala",
+                "Swift": "swift",
+                "Fortran": "fortran",
+                "COBOL": "cobol"
+            }.get(code_type, code_type.lower())
+            st.code(code, language=display_language)
 
 # Generate PDF
 if st.button("Generate PDF"):
