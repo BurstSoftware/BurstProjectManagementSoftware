@@ -25,6 +25,8 @@ if 'terminal_dict' not in st.session_state:
     st.session_state.terminal_dict = {}
 if 'modules_dict' not in st.session_state:
     st.session_state.modules_dict = {}
+if 'project_overview_dict' not in st.session_state:
+    st.session_state.project_overview_dict = {}
 
 # Main app layout
 st.title("Testing Documentation App")
@@ -61,6 +63,18 @@ if app_version:
         if app_version not in st.session_state.text_dict:
             st.session_state.text_dict[app_version] = []
         st.session_state.text_dict[app_version].append(f"Regression Notes: {regression_notes}")
+
+    # Project Overview Section
+    st.header("Project Overview")
+    project_overview = st.text_area(
+        "Enter Project Overview (Markdown):",
+        height=200,
+        help="Paste the content of your projectoverview.md file here"
+    )
+    if st.button("Save Project Overview"):
+        if app_version not in st.session_state.project_overview_dict:
+            st.session_state.project_overview_dict[app_version] = []
+        st.session_state.project_overview_dict[app_version].append(project_overview)
 
     # Terminal Output Section
     st.header("Terminal Output")
@@ -145,6 +159,13 @@ for app_version in st.session_state.task_list:
     if app_version in st.session_state.modules_dict:
         st.write(f"**Modules/Frameworks:** {st.session_state.modules_dict[app_version]}")
 
+    # Display project overview
+    if app_version in st.session_state.project_overview_dict:
+        st.write("#### Project Overview:")
+        for i, overview in enumerate(st.session_state.project_overview_dict[app_version]):
+            with st.expander(f"Project Overview {i+1}"):
+                st.markdown(overview)
+
     # Display text inputs
     if app_version in st.session_state.text_dict:
         st.write("#### Notes:")
@@ -204,6 +225,24 @@ if st.button("Generate PDF"):
                 styles['Normal']
             ))
             pdf_elements.append(Spacer(1, 10))
+
+        # Add project overview content
+        if app_version in st.session_state.project_overview_dict:
+            pdf_elements.append(Paragraph("Project Overview:", styles['Heading2']))
+            for i, overview in enumerate(st.session_state.project_overview_dict[app_version]):
+                pdf_elements.append(Paragraph(f"Project Overview {i+1}:", styles['Heading3']))
+                overview_paragraph_style = ParagraphStyle(
+                    name='OverviewStyle',
+                    fontName='Courier',
+                    fontSize=8,
+                    leftIndent=10,
+                    rightIndent=10,
+                    leading=8,
+                    wordWrap='CJK'
+                )
+                overview_paragraph = Preformatted(overview, overview_paragraph_style, maxLineLength=65)
+                pdf_elements.append(overview_paragraph)
+                pdf_elements.append(Spacer(1, 10))
 
         # Add text content
         if app_version in st.session_state.text_dict:
