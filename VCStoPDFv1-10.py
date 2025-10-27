@@ -37,12 +37,12 @@ col1, col2 = st.columns(2)
 with col1:
     app_version = st.text_input("App Version:")
 with col2:
-    interpreter_version = st.text_input("Interpreter Version:", placeholder="e.g., Python 3.9.0, Node.js 16.0.0, Java 17, Kotlin 1.9.0")
+    interpreter_version = st.text_input("Interpreter Version:", placeholder="e.g., Python 3.9.0, Node.js 16.0.0, Java 17, Kotlin 1.9.0, PostgreSQL 15")
 
 # Modules and Frameworks
 st.header("Modules and Frameworks")
 modules_input = st.text_area("Enter Modules/Frameworks (comma-separated):", 
-                           placeholder="e.g., React, Vue.js, Tailwind CSS, Flutter, Spring, SwiftUI")
+                           placeholder="e.g., React, Vue.js, Tailwind CSS, Flutter, Spring, SwiftUI, SQLAlchemy")
 if st.button("Save Modules/Frameworks"):
     if app_version and app_version not in st.session_state.task_list:
         st.session_state.task_list.append(app_version)
@@ -100,7 +100,7 @@ if app_version:
     supported_languages = [
         "Python", "HTML", "CSS", "JavaScript", "Dart", "Java", "R", "Julia", 
         "C", "C#", "C++", "Go", "Rust", "JSON", "XML", "Kotlin", "Scala", 
-        "Swift", "Fortran", "COBOL"
+        "Swift", "Fortran", "COBOL", "SQL"
     ]
 
     for i in range(st.session_state.code_sections):
@@ -132,7 +132,8 @@ if app_version:
             "Scala": "scala",
             "Swift": "swift",
             "Fortran": "fortran",
-            "COBOL": "cobol"
+            "COBOL": "cobol",
+            "SQL": "sql"
         }
 
         code = st_ace(
@@ -195,7 +196,8 @@ for app_version in st.session_state.task_list:
                 "Scala": "scala",
                 "Swift": "swift",
                 "Fortran": "fortran",
-                "COBOL": "cobol"
+                "COBOL": "cobol",
+                "SQL": "sql"
             }.get(code_type, code_type.lower())
             st.code(code, language=display_language)
 
