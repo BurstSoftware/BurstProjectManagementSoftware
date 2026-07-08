@@ -50,8 +50,10 @@ if st.button("Save Version Information"):
     if app_version and app_version not in st.session_state.task_list:
         st.session_state.task_list.append(app_version)
         st.session_state.interpreter_dict[app_version] = interpreter_version
-        st.session_state.app_version_input = ""
-        st.session_state.interpreter_version_input = ""
+        if "app_version_input" in st.session_state:
+            st.session_state.app_version_input = ""
+        if "interpreter_version_input" in st.session_state:
+            st.session_state.interpreter_version_input = ""
         st.rerun()
 
 # ====================== REQUIREMENTS ======================
@@ -80,7 +82,8 @@ if current_version:
     if st.button("Save Requirements"):
         if current_version:
             st.session_state.requirements_dict[current_version] = requirements_text
-            st.session_state.requirements_input = ""
+            if "requirements_input" in st.session_state:
+                st.session_state.requirements_input = ""
             st.success(f"Requirements saved for {current_version}")
             st.rerun()
 
@@ -93,7 +96,8 @@ if st.button("Save Regression Testing Notes"):
         if current_version not in st.session_state.text_dict:
             st.session_state.text_dict[current_version] = []
         st.session_state.text_dict[current_version].append(f"Regression Notes: {regression_notes}")
-        st.session_state.regression_notes_input = ""
+        if "regression_notes_input" in st.session_state:
+            st.session_state.regression_notes_input = ""
         st.success("Regression notes saved!")
         st.rerun()
 
@@ -111,7 +115,8 @@ if st.button("Save Terminal Output"):
         if current_version not in st.session_state.terminal_dict:
             st.session_state.terminal_dict[current_version] = []
         st.session_state.terminal_dict[current_version].append(terminal_output)
-        st.session_state.terminal_input = ""
+        if "terminal_input" in st.session_state:
+            st.session_state.terminal_input = ""
         st.success("Terminal output saved!")
         st.rerun()
 
