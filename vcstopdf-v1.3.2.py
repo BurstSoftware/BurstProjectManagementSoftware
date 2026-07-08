@@ -28,6 +28,12 @@ if 'requirements_dict' not in st.session_state:
 if 'code_sections' not in st.session_state:
     st.session_state.code_sections = 1
 
+# Initialize input fields safely
+for key in ["app_version_input", "interpreter_version_input", "requirements_input", 
+            "regression_notes_input", "terminal_input"]:
+    if key not in st.session_state:
+        st.session_state[key] = ""
+
 st.title("Testing Documentation App")
 
 # ====================== VERSION INFORMATION ======================
@@ -135,7 +141,7 @@ for i in range(st.session_state.code_sections):
                 st.session_state.code_sections += 1
             st.rerun()
 
-# ====================== SAVED ITEMS DISPLAY ======================
+# ====================== SAVED ITEMS ======================
 st.write("## Saved Items")
 for ver in st.session_state.task_list:
     st.write(f"### App Version: {ver}")
@@ -178,23 +184,20 @@ if st.button("Generate PDF"):
             elements.append(Paragraph(f"Interpreter Version: {st.session_state.interpreter_dict[ver]}", styles['Normal']))
         elements.append(Spacer(1, 12))
 
-        # Requirements
         if ver in st.session_state.requirements_dict:
             reqs = st.session_state.requirements_dict[ver]
             if reqs.strip():
                 elements.append(Paragraph("Requirements (requirements.txt):", styles['Heading2']))
-                style = ParagraphStyle('CodeStyle', parent=styles['Normal'], fontName='Courier', fontSize=9, leading=10)
+                style = ParagraphStyle('ReqStyle', parent=styles['Normal'], fontName='Courier', fontSize=9, leading=10)
                 elements.append(Preformatted(reqs, style))
                 elements.append(Spacer(1, 12))
 
-        # Notes
         if ver in st.session_state.text_dict:
             elements.append(Paragraph("Notes:", styles['Heading2']))
             for t in st.session_state.text_dict[ver]:
                 elements.append(Paragraph(f"• {t}", styles['Normal']))
             elements.append(Spacer(1, 12))
 
-        # Terminal
         if ver in st.session_state.terminal_dict:
             elements.append(Paragraph("Terminal Outputs:", styles['Heading2']))
             for i, out in enumerate(st.session_state.terminal_dict[ver]):
@@ -203,7 +206,6 @@ if st.button("Generate PDF"):
                 elements.append(Preformatted(out, style))
                 elements.append(Spacer(1, 12))
 
-        # Code
         if ver in st.session_state.code_dict:
             elements.append(Paragraph("Code Sections:", styles['Heading2']))
             for i, c in enumerate(st.session_state.code_dict[ver]):
