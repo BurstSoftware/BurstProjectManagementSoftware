@@ -40,7 +40,7 @@ openai>=1.35.0"""
 pandas>=2.2.0"""
 }
     # Add more presets here in the future
-
+}
 # Function to create download PDF link
 def create_download_link_pdf(pdf_data, download_filename):
     b64 = base64.b64encode(pdf_data).decode()
