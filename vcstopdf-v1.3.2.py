@@ -23,7 +23,6 @@ if 'interpreter_dict' not in st.session_state:
     st.session_state.interpreter_dict = {}
 if 'terminal_dict' not in st.session_state:
     st.session_state.terminal_dict = {}
-# NEW: Requirements.txt dictionary
 if 'requirements_dict' not in st.session_state:
     st.session_state.requirements_dict = {}
 
@@ -52,7 +51,7 @@ if app_version:
             st.session_state.text_dict[app_version] = []
         st.session_state.text_dict[app_version].append(f"Regression Notes: {regression_notes}")
 
-    # NEW: Requirements.txt Section
+    # Requirements.txt Section
     st.header("requirements.txt")
     st.caption("Enter your project dependencies (one per line)")
     requirements_input = st.text_area(
@@ -105,11 +104,10 @@ st.write("## Saved Items")
 for app_version in st.session_state.task_list:
     st.write(f"### App Version: {app_version}")
     
-    # Display interpreter version
     if app_version in st.session_state.interpreter_dict:
         st.write(f"**Interpreter Version:** {st.session_state.interpreter_dict[app_version]}")
 
-    # NEW: Display requirements.txt
+    # Display requirements.txt
     if app_version in st.session_state.requirements_dict:
         st.write("#### requirements.txt:")
         for i, req in enumerate(st.session_state.requirements_dict[app_version]):
@@ -136,7 +134,7 @@ for app_version in st.session_state.task_list:
             st.write(f"Code Section {i+1}:")
             st.code(code, language="python")
 
-# Generate PDF
+# ========================== GENERATE PDF ==========================
 if st.button("Generate PDF"):
     pdf_buffer = BytesIO()
     doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, leftMargin=36, rightMargin=36)
@@ -147,81 +145,80 @@ if st.button("Generate PDF"):
     for app_version in st.session_state.task_list:
         pdf_elements.append(Paragraph(f"App Version: {app_version}", styles['Heading1']))
         
-        # Add interpreter version
+        # Interpreter Version
         if app_version in st.session_state.interpreter_dict:
             pdf_elements.append(Paragraph(
                 f"Interpreter Version: {st.session_state.interpreter_dict[app_version]}",
                 styles['Normal']
             ))
-            pdf_elements.append(Spacer(1, 10))
+            pdf_elements.append(Spacer(1, 12))
 
-        # NEW: Add requirements.txt content
+        # Requirements.txt - Clean single header
         if app_version in st.session_state.requirements_dict:
             pdf_elements.append(Paragraph("requirements.txt:", styles['Heading2']))
             for i, req in enumerate(st.session_state.requirements_dict[app_version]):
-                pdf_elements.append(Paragraph(f"requirements.txt {i+1}:", styles['Heading3']))
+                if len(st.session_state.requirements_dict[app_version]) > 1:
+                    pdf_elements.append(Paragraph(f"Entry {i+1}:", styles['Heading3']))
+                
                 req_style = ParagraphStyle(
                     name='ReqStyle',
                     fontName='Courier',
                     fontSize=9,
                     leftIndent=10,
                     rightIndent=10,
-                    leading=10,
+                    leading=11,
                     wordWrap='CJK'
                 )
-                req_paragraph = Preformatted(req, req_style, maxLineLength=70)
-                pdf_elements.append(req_paragraph)
-                pdf_elements.append(Spacer(1, 10))
+                pdf_elements.append(Preformatted(req, req_style, maxLineLength=70))
+                pdf_elements.append(Spacer(1, 12))
 
-        # Add text content
+        # Notes
         if app_version in st.session_state.text_dict:
             pdf_elements.append(Paragraph("Notes:", styles['Heading2']))
             for text in st.session_state.text_dict[app_version]:
-                pdf_elements.append(Paragraph(f"- {text}", styles['Normal']))
-            pdf_elements.append(Spacer(1, 10))
+                pdf_elements.append(Paragraph(f"• {text}", styles['Normal']))
+            pdf_elements.append(Spacer(1, 12))
 
-        # Add terminal output content
+        # Terminal Outputs - Clean single header
         if app_version in st.session_state.terminal_dict:
             pdf_elements.append(Paragraph("Terminal Outputs:", styles['Heading2']))
             for i, output in enumerate(st.session_state.terminal_dict[app_version]):
-                pdf_elements.append(Paragraph(f"Terminal Output {i+1}:", styles['Heading3']))
-                code_paragraph_style = ParagraphStyle(
+                if len(st.session_state.terminal_dict[app_version]) > 1:
+                    pdf_elements.append(Paragraph(f"Output {i+1}:", styles['Heading3']))
+                
+                term_style = ParagraphStyle(
                     name='TerminalStyle',
                     fontName='Courier',
                     fontSize=8,
                     leftIndent=10,
                     rightIndent=10,
-                    leading=8,
+                    leading=9,
                     wordWrap='CJK'
                 )
-                terminal_paragraph = Preformatted(output, code_paragraph_style, maxLineLength=65)
-                pdf_elements.append(terminal_paragraph)
-                pdf_elements.append(Spacer(1, 10))
+                pdf_elements.append(Preformatted(output, term_style, maxLineLength=65))
+                pdf_elements.append(Spacer(1, 12))
 
-        # Add code content
+        # Code Sections
         if app_version in st.session_state.code_dict:
             pdf_elements.append(Paragraph("Code Sections:", styles['Heading2']))
             for i, code in enumerate(st.session_state.code_dict[app_version]):
-                pdf_elements.append(Paragraph(f"Code Section {i+1}:", styles['Heading3']))
-                code_paragraph_style = ParagraphStyle(
+                if len(st.session_state.code_dict[app_version]) > 1:
+                    pdf_elements.append(Paragraph(f"Code Section {i+1}:", styles['Heading3']))
+                
+                code_style = ParagraphStyle(
                     name='CodeStyle',
                     fontName='Courier',
                     fontSize=8,
                     leftIndent=10,
                     rightIndent=10,
-                    leading=8,
+                    leading=9,
                     wordWrap='CJK'
                 )
-                code_paragraph = Preformatted(code, code_paragraph_style, maxLineLength=65)
-                pdf_elements.append(code_paragraph)
-                pdf_elements.append(Spacer(1, 10))
+                pdf_elements.append(Preformatted(code, code_style, maxLineLength=65))
+                pdf_elements.append(Spacer(1, 12))
 
-    # Build the PDF document
     doc.build(pdf_elements)
-    
-    # Output the PDF content
     pdf_buffer.seek(0)
     pdf_data = pdf_buffer.read()
     
-    # Create download link
     st.markdown(create_download_link_pdf(pdf_data, "documentation.pdf"), unsafe_allow_html=True)
