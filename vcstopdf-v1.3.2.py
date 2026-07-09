@@ -46,7 +46,7 @@ pandas>=2.2.0"""
 scikit-learn==1.3.0
 pandas==2.0.3
 numpy==1.24.3"""
-    }
+    },
     "Alternative To Polsia (Python 3.14.6)": {
         "project_type": "Alternative To Polsia",
         "python_version": "Python 3.14.6",
