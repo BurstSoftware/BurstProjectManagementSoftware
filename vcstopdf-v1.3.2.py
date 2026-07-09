@@ -38,7 +38,15 @@ openai>=1.35.0"""
     "python_version": "Python 3.14.6",
     "requirements": """streamlit>=1.38.0
 pandas>=2.2.0"""
-}
+}, 
+    "Python Code Snippets (Python 3.10.20)": {
+        "project_type": "Python Code Snippets",
+        "python_version": "Python 3.10.20",
+        "requirements": """streamlit==1.22.0
+scikit-learn==1.3.0
+pandas==2.0.3
+numpy==1.24.3"""
+    }
     # Add more presets here in the future
 }
 # Function to create download PDF link
