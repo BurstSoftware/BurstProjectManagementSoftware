@@ -6,18 +6,26 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatted
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
-# ====================== PREDEFINED REQUIREMENTS ======================
+# ====================== PREDEFINED PRESETS ======================
 PRESETS = {
-    "Custom (Paste your own)": "",
-    "Default Project (Python 3.10.20)": """streamlit==1.32.0
+    "Custom (Paste your own)": {
+        "project_type": "Custom Project",
+        "python_version": "",
+        "requirements": ""
+    },
+    "Testing Documentation App (Python 3.10.20)": {
+        "project_type": "Testing Documentation App",
+        "python_version": "Python 3.10.20",
+        "requirements": """streamlit==1.32.0
 streamlit-ace==0.1.1
 reportlab==4.3.1
 google-generativeai==0.3.2
 streamlit-extras==0.3.5
 streamlit-option-menu==0.3.6
 speechrecognition==3.10.0
-requests>=2.31.0""",
-    # You can add more presets here in the future
+requests>=2.31.0"""
+    },
+    # Add more presets here in the future
 }
 
 # Function to create download PDF link
@@ -64,37 +72,39 @@ if app_version:
             st.session_state.text_dict[app_version] = []
         st.session_state.text_dict[app_version].append(f"Regression Notes: {regression_notes}")
 
-    # ==================== IMPROVED REQUIREMENTS.TXT SECTION ====================
-    st.header("requirements.txt")
+    # ==================== REQUIREMENTS.TXT WITH PROJECT TYPE ====================
+    st.header("requirements.txt & Project Info")
     
-    # Preset Dropdown
     preset_choice = st.selectbox(
-        "Choose requirements preset:",
+        "Choose Project Preset:",
         options=list(PRESETS.keys()),
-        index=0,  # Default to Custom
-        help="Select a preset or choose Custom to paste your own"
+        index=1,  # Default to your Testing Documentation App
+        help="Select a project type or Custom"
     )
 
-    # Text area (auto-filled when preset changes)
+    selected = PRESETS[preset_choice]
+
+    # Show Project Type
+    st.info(f"**Project Type:** {selected['project_type']}")
+
     requirements_input = st.text_area(
         "requirements.txt content:",
-        value=PRESETS[preset_choice],
+        value=selected["requirements"],
         height=220,
-        placeholder="Paste or edit requirements here...",
-        help="You can edit the preset or paste your own content"
+        placeholder="Edit requirements here if needed...",
     )
 
     if st.button("Save requirements.txt"):
         if app_version not in st.session_state.requirements_dict:
             st.session_state.requirements_dict[app_version] = []
         
-        # Save both requirements and python version together
         entry = {
-            "content": requirements_input,
-            "python_version": interpreter_version or "Not specified"
+            "project_type": selected["project_type"],
+            "python_version": selected["python_version"] or interpreter_version or "Not specified",
+            "content": requirements_input
         }
         st.session_state.requirements_dict[app_version].append(entry)
-        st.success(f"requirements.txt saved for version {app_version}")
+        st.success(f"Project info & requirements saved for version {app_version}")
 
     # Terminal Output
     st.header("Terminal Output")
@@ -104,7 +114,7 @@ if app_version:
             st.session_state.terminal_dict[app_version] = []
         st.session_state.terminal_dict[app_version].append(terminal_output)
 
-    # Code Sections (unchanged)
+    # Code Sections
     st.header("Code Input Sections")
     if 'code_sections' not in st.session_state:
         st.session_state.code_sections = 1
@@ -128,15 +138,15 @@ for app_version in st.session_state.task_list:
     if app_version in st.session_state.interpreter_dict:
         st.write(f"**Interpreter Version:** {st.session_state.interpreter_dict[app_version]}")
 
-    # Display requirements with Python version
+    # Display requirements with Project Type & Python Version
     if app_version in st.session_state.requirements_dict:
         st.write("#### requirements.txt:")
         for i, req in enumerate(st.session_state.requirements_dict[app_version]):
-            with st.expander(f"requirements.txt {i+1}"):
+            with st.expander(f"Entry {i+1} - {req['project_type']}"):
+                st.write(f"**Project Type:** {req['project_type']}")
                 st.write(f"**Python Version:** {req['python_version']}")
                 st.code(req['content'], language="text")
 
-    # Other sections (Notes, Terminal, Code) remain the same...
     if app_version in st.session_state.text_dict:
         st.write("#### Notes:")
         for text in st.session_state.text_dict[app_version]:
@@ -154,7 +164,7 @@ for app_version in st.session_state.task_list:
             st.write(f"Code Section {i+1}:")
             st.code(code, language="python")
 
-# ====================== GENERATE PDF (Updated for new structure) ======================
+# ====================== GENERATE PDF ======================
 if st.button("Generate PDF"):
     pdf_buffer = BytesIO()
     doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, leftMargin=36, rightMargin=36)
@@ -171,13 +181,14 @@ if st.button("Generate PDF"):
             ))
             pdf_elements.append(Spacer(1, 12))
 
-        # Requirements with Python version
+        # Requirements with Project Type
         if app_version in st.session_state.requirements_dict:
             pdf_elements.append(Paragraph("requirements.txt:", styles['Heading2']))
             for i, req in enumerate(st.session_state.requirements_dict[app_version]):
                 if len(st.session_state.requirements_dict[app_version]) > 1:
                     pdf_elements.append(Paragraph(f"Entry {i+1}:", styles['Heading3']))
                 
+                pdf_elements.append(Paragraph(f"Project Type: {req['project_type']}", styles['Normal']))
                 pdf_elements.append(Paragraph(f"Python Version: {req['python_version']}", styles['Normal']))
                 pdf_elements.append(Spacer(1, 8))
                 
@@ -186,7 +197,7 @@ if st.button("Generate PDF"):
                 pdf_elements.append(Preformatted(req['content'], req_style, maxLineLength=70))
                 pdf_elements.append(Spacer(1, 12))
 
-        # Notes, Terminal, Code sections (same as before)
+        # Notes, Terminal, Code (unchanged)
         if app_version in st.session_state.text_dict:
             pdf_elements.append(Paragraph("Notes:", styles['Heading2']))
             for text in st.session_state.text_dict[app_version]:
