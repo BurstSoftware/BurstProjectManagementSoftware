@@ -6,6 +6,20 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatted
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
+# ====================== PREDEFINED REQUIREMENTS ======================
+PRESETS = {
+    "Custom (Paste your own)": "",
+    "Default Project (Python 3.10.20)": """streamlit==1.32.0
+streamlit-ace==0.1.1
+reportlab==4.3.1
+google-generativeai==0.3.2
+streamlit-extras==0.3.5
+streamlit-option-menu==0.3.6
+speechrecognition==3.10.0
+requests>=2.31.0""",
+    # You can add more presets here in the future
+}
+
 # Function to create download PDF link
 def create_download_link_pdf(pdf_data, download_filename):
     b64 = base64.b64encode(pdf_data).decode()
@@ -26,16 +40,16 @@ if 'terminal_dict' not in st.session_state:
 if 'requirements_dict' not in st.session_state:
     st.session_state.requirements_dict = {}
 
-# Main app layout
+# ====================== MAIN APP ======================
 st.title("Testing Documentation App")
 
-# Version Input Section
+# Version Information
 st.header("Version Information")
 col1, col2 = st.columns(2)
 with col1:
     app_version = st.text_input("App Version:")
 with col2:
-    interpreter_version = st.text_input("Interpreter Version:", placeholder="e.g., Python 3.9.0")
+    interpreter_version = st.text_input("Interpreter Version:", placeholder="e.g., Python 3.10.20")
 
 if st.button("Save Version Information"):
     if app_version and app_version not in st.session_state.task_list:
@@ -43,7 +57,6 @@ if st.button("Save Version Information"):
         st.session_state.interpreter_dict[app_version] = interpreter_version
 
 if app_version:
-    # Default inputs
     st.header("Testing Notes")
     regression_notes = st.text_area("Enter Regression Testing Notes:")
     if st.button("Save Regression Testing Notes"):
@@ -51,34 +64,47 @@ if app_version:
             st.session_state.text_dict[app_version] = []
         st.session_state.text_dict[app_version].append(f"Regression Notes: {regression_notes}")
 
-    # Requirements.txt Section
+    # ==================== IMPROVED REQUIREMENTS.TXT SECTION ====================
     st.header("requirements.txt")
-    st.caption("Enter your project dependencies (one per line)")
+    
+    # Preset Dropdown
+    preset_choice = st.selectbox(
+        "Choose requirements preset:",
+        options=list(PRESETS.keys()),
+        index=0,  # Default to Custom
+        help="Select a preset or choose Custom to paste your own"
+    )
+
+    # Text area (auto-filled when preset changes)
     requirements_input = st.text_area(
         "requirements.txt content:",
-        height=200,
-        placeholder="streamlit\npandas\nnumpy\n...",
-        help="Paste or type your requirements.txt content here"
+        value=PRESETS[preset_choice],
+        height=220,
+        placeholder="Paste or edit requirements here...",
+        help="You can edit the preset or paste your own content"
     )
+
     if st.button("Save requirements.txt"):
         if app_version not in st.session_state.requirements_dict:
             st.session_state.requirements_dict[app_version] = []
-        st.session_state.requirements_dict[app_version].append(requirements_input)
+        
+        # Save both requirements and python version together
+        entry = {
+            "content": requirements_input,
+            "python_version": interpreter_version or "Not specified"
+        }
+        st.session_state.requirements_dict[app_version].append(entry)
         st.success(f"requirements.txt saved for version {app_version}")
 
-    # Terminal Output Section
+    # Terminal Output
     st.header("Terminal Output")
-    terminal_output = st.text_area(
-        "Enter Terminal Output:",
-        height=200,
-        help="Paste any relevant terminal output, error messages, or command results here"
-    )
+    terminal_output = st.text_area("Enter Terminal Output:", height=200)
     if st.button("Save Terminal Output"):
         if app_version not in st.session_state.terminal_dict:
             st.session_state.terminal_dict[app_version] = []
         st.session_state.terminal_dict[app_version].append(terminal_output)
 
-    # Multiple code editors
+    # Code Sections (unchanged)
     st.header("Code Input Sections")
     if 'code_sections' not in st.session_state:
         st.session_state.code_sections = 1
@@ -88,18 +114,13 @@ if app_version:
 
     for i in range(st.session_state.code_sections):
         st.subheader(f"Code Section {i+1}")
-        code = st_ace(
-            language="python",
-            theme="monokai",
-            key=f"ace-editor-{i}",
-            placeholder="Enter your code here..."
-        )
+        code = st_ace(language="python", theme="monokai", key=f"ace-editor-{i}")
         if st.button(f"Save Code Section {i+1}"):
             if app_version not in st.session_state.code_dict:
                 st.session_state.code_dict[app_version] = []
             st.session_state.code_dict[app_version].append(code)
 
-# Display saved items
+# ====================== DISPLAY SAVED ITEMS ======================
 st.write("## Saved Items")
 for app_version in st.session_state.task_list:
     st.write(f"### App Version: {app_version}")
@@ -107,45 +128,42 @@ for app_version in st.session_state.task_list:
     if app_version in st.session_state.interpreter_dict:
         st.write(f"**Interpreter Version:** {st.session_state.interpreter_dict[app_version]}")
 
-    # Display requirements.txt
+    # Display requirements with Python version
     if app_version in st.session_state.requirements_dict:
         st.write("#### requirements.txt:")
         for i, req in enumerate(st.session_state.requirements_dict[app_version]):
             with st.expander(f"requirements.txt {i+1}"):
-                st.code(req, language="text")
+                st.write(f"**Python Version:** {req['python_version']}")
+                st.code(req['content'], language="text")
 
-    # Display text inputs
+    # Other sections (Notes, Terminal, Code) remain the same...
     if app_version in st.session_state.text_dict:
         st.write("#### Notes:")
         for text in st.session_state.text_dict[app_version]:
             st.write(f"- {text}")
 
-    # Display terminal outputs
     if app_version in st.session_state.terminal_dict:
         st.write("#### Terminal Outputs:")
         for i, output in enumerate(st.session_state.terminal_dict[app_version]):
             with st.expander(f"Terminal Output {i+1}"):
                 st.code(output, language="bash")
 
-    # Display code sections
     if app_version in st.session_state.code_dict:
         st.write("#### Code Sections:")
         for i, code in enumerate(st.session_state.code_dict[app_version]):
             st.write(f"Code Section {i+1}:")
             st.code(code, language="python")
 
-# ========================== GENERATE PDF ==========================
+# ====================== GENERATE PDF (Updated for new structure) ======================
 if st.button("Generate PDF"):
     pdf_buffer = BytesIO()
     doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, leftMargin=36, rightMargin=36)
     styles = getSampleStyleSheet()
-
     pdf_elements = []
-    
+
     for app_version in st.session_state.task_list:
         pdf_elements.append(Paragraph(f"App Version: {app_version}", styles['Heading1']))
-        
-        # Interpreter Version
+
         if app_version in st.session_state.interpreter_dict:
             pdf_elements.append(Paragraph(
                 f"Interpreter Version: {st.session_state.interpreter_dict[app_version]}",
@@ -153,72 +171,49 @@ if st.button("Generate PDF"):
             ))
             pdf_elements.append(Spacer(1, 12))
 
-        # Requirements.txt - Clean single header
+        # Requirements with Python version
         if app_version in st.session_state.requirements_dict:
             pdf_elements.append(Paragraph("requirements.txt:", styles['Heading2']))
             for i, req in enumerate(st.session_state.requirements_dict[app_version]):
                 if len(st.session_state.requirements_dict[app_version]) > 1:
                     pdf_elements.append(Paragraph(f"Entry {i+1}:", styles['Heading3']))
                 
-                req_style = ParagraphStyle(
-                    name='ReqStyle',
-                    fontName='Courier',
-                    fontSize=9,
-                    leftIndent=10,
-                    rightIndent=10,
-                    leading=11,
-                    wordWrap='CJK'
-                )
-                pdf_elements.append(Preformatted(req, req_style, maxLineLength=70))
+                pdf_elements.append(Paragraph(f"Python Version: {req['python_version']}", styles['Normal']))
+                pdf_elements.append(Spacer(1, 8))
+                
+                req_style = ParagraphStyle(name='ReqStyle', fontName='Courier', fontSize=9,
+                                         leftIndent=10, rightIndent=10, leading=11, wordWrap='CJK')
+                pdf_elements.append(Preformatted(req['content'], req_style, maxLineLength=70))
                 pdf_elements.append(Spacer(1, 12))
 
-        # Notes
+        # Notes, Terminal, Code sections (same as before)
         if app_version in st.session_state.text_dict:
             pdf_elements.append(Paragraph("Notes:", styles['Heading2']))
             for text in st.session_state.text_dict[app_version]:
                 pdf_elements.append(Paragraph(f"• {text}", styles['Normal']))
             pdf_elements.append(Spacer(1, 12))
 
-        # Terminal Outputs - Clean single header
         if app_version in st.session_state.terminal_dict:
             pdf_elements.append(Paragraph("Terminal Outputs:", styles['Heading2']))
             for i, output in enumerate(st.session_state.terminal_dict[app_version]):
                 if len(st.session_state.terminal_dict[app_version]) > 1:
                     pdf_elements.append(Paragraph(f"Output {i+1}:", styles['Heading3']))
-                
-                term_style = ParagraphStyle(
-                    name='TerminalStyle',
-                    fontName='Courier',
-                    fontSize=8,
-                    leftIndent=10,
-                    rightIndent=10,
-                    leading=9,
-                    wordWrap='CJK'
-                )
+                term_style = ParagraphStyle(name='TerminalStyle', fontName='Courier', fontSize=8,
+                                          leftIndent=10, rightIndent=10, leading=9, wordWrap='CJK')
                 pdf_elements.append(Preformatted(output, term_style, maxLineLength=65))
                 pdf_elements.append(Spacer(1, 12))
 
-        # Code Sections
         if app_version in st.session_state.code_dict:
             pdf_elements.append(Paragraph("Code Sections:", styles['Heading2']))
             for i, code in enumerate(st.session_state.code_dict[app_version]):
                 if len(st.session_state.code_dict[app_version]) > 1:
                     pdf_elements.append(Paragraph(f"Code Section {i+1}:", styles['Heading3']))
-                
-                code_style = ParagraphStyle(
-                    name='CodeStyle',
-                    fontName='Courier',
-                    fontSize=8,
-                    leftIndent=10,
-                    rightIndent=10,
-                    leading=9,
-                    wordWrap='CJK'
-                )
+                code_style = ParagraphStyle(name='CodeStyle', fontName='Courier', fontSize=8,
+                                          leftIndent=10, rightIndent=10, leading=9, wordWrap='CJK')
                 pdf_elements.append(Preformatted(code, code_style, maxLineLength=65))
                 pdf_elements.append(Spacer(1, 12))
 
     doc.build(pdf_elements)
     pdf_buffer.seek(0)
     pdf_data = pdf_buffer.read()
-    
     st.markdown(create_download_link_pdf(pdf_data, "documentation.pdf"), unsafe_allow_html=True)
