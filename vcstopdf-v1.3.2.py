@@ -33,8 +33,13 @@ pandas>=2.2.0
 plotly>=6.0.0
 openai>=1.35.0"""
     },
-    # Add more presets here in the future
+    "Business Reality Assessment Dashboard (Python 3.14.6)": {
+    "project_type": "Open Job Postings",
+    "python_version": "Python 3.14.6",
+    "requirements": """streamlit>=1.38.0
+pandas>=2.2.0"""
 }
+    # Add more presets here in the future
 
 # Function to create download PDF link
 def create_download_link_pdf(pdf_data, download_filename):
