@@ -25,6 +25,14 @@ streamlit-option-menu==0.3.6
 speechrecognition==3.10.0
 requests>=2.31.0"""
     },
+    "Open Job Postings (Python 3.14.6)": {
+        "project_type": "Open Job Postings",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.38.0
+pandas>=2.2.0
+plotly>=6.0.0
+openai>=1.35.0"""
+    },
     # Add more presets here in the future
 }
 
@@ -57,7 +65,7 @@ col1, col2 = st.columns(2)
 with col1:
     app_version = st.text_input("App Version:")
 with col2:
-    interpreter_version = st.text_input("Interpreter Version:", placeholder="e.g., Python 3.10.20")
+    interpreter_version = st.text_input("Interpreter Version:", placeholder="e.g., Python 3.14.6")
 
 if st.button("Save Version Information"):
     if app_version and app_version not in st.session_state.task_list:
@@ -72,25 +80,24 @@ if app_version:
             st.session_state.text_dict[app_version] = []
         st.session_state.text_dict[app_version].append(f"Regression Notes: {regression_notes}")
 
-    # ==================== REQUIREMENTS.TXT WITH PROJECT TYPE ====================
+    # ==================== REQUIREMENTS.TXT & PROJECT INFO ====================
     st.header("requirements.txt & Project Info")
     
     preset_choice = st.selectbox(
         "Choose Project Preset:",
         options=list(PRESETS.keys()),
-        index=1,  # Default to your Testing Documentation App
+        index=0,
         help="Select a project type or Custom"
     )
 
     selected = PRESETS[preset_choice]
 
-    # Show Project Type
-    st.info(f"**Project Type:** {selected['project_type']}")
+    st.info(f"**Selected Project Type:** {selected['project_type']}")
 
     requirements_input = st.text_area(
         "requirements.txt content:",
         value=selected["requirements"],
-        height=220,
+        height=240,
         placeholder="Edit requirements here if needed...",
     )
 
@@ -104,7 +111,7 @@ if app_version:
             "content": requirements_input
         }
         st.session_state.requirements_dict[app_version].append(entry)
-        st.success(f"Project info & requirements saved for version {app_version}")
+        st.success(f"Saved for {app_version} - {selected['project_type']}")
 
     # Terminal Output
     st.header("Terminal Output")
@@ -138,7 +145,6 @@ for app_version in st.session_state.task_list:
     if app_version in st.session_state.interpreter_dict:
         st.write(f"**Interpreter Version:** {st.session_state.interpreter_dict[app_version]}")
 
-    # Display requirements with Project Type & Python Version
     if app_version in st.session_state.requirements_dict:
         st.write("#### requirements.txt:")
         for i, req in enumerate(st.session_state.requirements_dict[app_version]):
@@ -181,7 +187,7 @@ if st.button("Generate PDF"):
             ))
             pdf_elements.append(Spacer(1, 12))
 
-        # Requirements with Project Type
+        # Requirements Section
         if app_version in st.session_state.requirements_dict:
             pdf_elements.append(Paragraph("requirements.txt:", styles['Heading2']))
             for i, req in enumerate(st.session_state.requirements_dict[app_version]):
@@ -197,13 +203,14 @@ if st.button("Generate PDF"):
                 pdf_elements.append(Preformatted(req['content'], req_style, maxLineLength=70))
                 pdf_elements.append(Spacer(1, 12))
 
-        # Notes, Terminal, Code (unchanged)
+        # Notes
         if app_version in st.session_state.text_dict:
             pdf_elements.append(Paragraph("Notes:", styles['Heading2']))
             for text in st.session_state.text_dict[app_version]:
                 pdf_elements.append(Paragraph(f"• {text}", styles['Normal']))
             pdf_elements.append(Spacer(1, 12))
 
+        # Terminal Outputs
         if app_version in st.session_state.terminal_dict:
             pdf_elements.append(Paragraph("Terminal Outputs:", styles['Heading2']))
             for i, output in enumerate(st.session_state.terminal_dict[app_version]):
@@ -214,6 +221,7 @@ if st.button("Generate PDF"):
                 pdf_elements.append(Preformatted(output, term_style, maxLineLength=65))
                 pdf_elements.append(Spacer(1, 12))
 
+        # Code Sections
         if app_version in st.session_state.code_dict:
             pdf_elements.append(Paragraph("Code Sections:", styles['Heading2']))
             for i, code in enumerate(st.session_state.code_dict[app_version]):
