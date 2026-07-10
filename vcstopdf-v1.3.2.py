@@ -348,6 +348,12 @@ pandas==2.3.3"""
         "requirements": """streamlit==1.50.0
 streamlit-ace==0.1.1
 reportlab==4.4.4"""
+    },
+    "xml-https-link-ripper-v1 (Python 3.13.14)": {
+        "project_type": "xml-https-link-ripper-v1",
+        "python_version": "Python 3.13.14",
+        "requirements": """streamlit==1.39.0
+pandas==2.2.3"""
     }
     # Add more presets here in the future
 }
