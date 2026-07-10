@@ -328,6 +328,13 @@ requests>=2.31.0"""
         "python_version": "Python 3.14.6",
         "requirements": """streamlit==1.39.0
 pandas==2.2.2"""
+    },
+    "S3 Bucket Apps (Python 3.14.6)": {
+        "project_type": "S3 Bucket Apps",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.28.0
+pandas>=2.0.0
+s3fs>=2023.10.0"""
     }
     # Add more presets here in the future
 }
