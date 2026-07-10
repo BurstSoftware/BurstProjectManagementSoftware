@@ -198,6 +198,13 @@ altair>=5.3.0
 pandas>=2.2.2
 numpy>=2.1.0
 pyarrow>=16.1.0"""
+    },
+    "Talk-time-wage-theft-tool (Python 3.14.6)": {
+        "project_type": "Talk-time-wage-theft-tool",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.38.0
+pandas>=2.2.0
+altair>=5.0.0"""
     }
     # Add more presets here in the future
 }
