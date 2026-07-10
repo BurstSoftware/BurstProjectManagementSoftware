@@ -77,6 +77,12 @@ openpyxl>=3.1.0        # If you want Excel export later"""
         "project_type": "Prompt Library",
         "python_version": "Python 3.14.6",
         "requirements": """streamlit>=1.38.0"""
+    },
+    "Business Metrics Tracker (Python 3.14.6)": {
+        "project_type": "Business Metrics Tracker",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.38.0
+pandas>=2.0.0"""
     }
     # Add more presets here in the future
 }
