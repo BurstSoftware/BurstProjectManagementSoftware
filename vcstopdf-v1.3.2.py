@@ -418,6 +418,16 @@ python-levenshtein==0.26.0"""
 tensorflow==2.17.0
 numpy==1.26.4
 pillow==10.4.0"""
+    },
+     "Market Analysis (Python 3.10.20)": {
+        "project_type": "Market Analysis",
+        "python_version": "Python 3.10.20",
+        "requirements": """streamlit==1.36.0
+pandas==2.2.2
+numpy==1.26.4
+matplotlib==3.8.4
+plotly==5.22.0
+scikit-learn==1.5.0"""
     }
     # Add more presets here in the future
 }
