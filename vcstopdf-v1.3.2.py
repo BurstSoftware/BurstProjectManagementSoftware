@@ -220,6 +220,13 @@ plotly>=5.24.0"""
         "requirements": """streamlit>=1.42.0
 pandas==2.2.2
 altair==5.4.1"""
+    },
+    "helping-engaging-respectful-obsessed-amazon-rating-tool-v1 (Python 3.14.6)": {
+        "project_type": "helping-engaging-respectful-obsessed-amazon-rating-tool-v1",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.57.0
+pandas>=2.2.0
+plotly>=5.24.0"""
     }
     # Add more presets here in the future
 }
