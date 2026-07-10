@@ -402,6 +402,14 @@ pandas==2.2.2
 numpy==1.26.4
 matplotlib==3.9.2
 seaborn==0.13.2"""
+    },
+    "Company Business Rating System (Python 3.10.20)": {
+        "project_type": "Company Business Rating System",
+        "python_version": "Python 3.10.20",
+        "requirements": """streamlit==1.39.0
+pandas==2.2.3
+fuzzywuzzy==0.18.0
+python-levenshtein==0.26.0"""
     }
     # Add more presets here in the future
 }
