@@ -373,6 +373,13 @@ graphviz>=0.20.1"""
         "project_type": "Cyber Security Boilerplate App",
         "python_version": "Python 3.13.14",
         "requirements": """streamlit==1.39.00"""
+    },
+    "CRM v2 (Python 3.13.14)": {
+        "project_type": "CRM v2",
+        "python_version": "Python 3.13.14",
+        "requirements": """streamlit==1.38.0
+pandas==2.2.2
+plotly==5.22.0"""
     }
     # Add more presets here in the future
 }
