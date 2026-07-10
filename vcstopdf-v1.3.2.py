@@ -272,6 +272,12 @@ pandas>=2.0.0"""
         "requirements": """streamlit==1.42.0
 pandas==2.2.3
 fpdf==1.7.2"""
+    },
+    "Gas Station Locations (Python 3.14.6)": {
+        "project_type": "Gas Station Locations",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit==1.41.1
+pandas==2.2.3"""
     }
     # Add more presets here in the future
 }
