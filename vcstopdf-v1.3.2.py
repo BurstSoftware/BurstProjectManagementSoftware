@@ -354,6 +354,12 @@ reportlab==4.4.4"""
         "python_version": "Python 3.13.14",
         "requirements": """streamlit==1.39.0
 pandas==2.2.3"""
+    },
+    "Job Boards v1 (Python 3.13.14)": {
+        "project_type": "Job Boards v1",
+        "python_version": "Python 3.13.14",
+        "requirements": """streamlit==1.39.00
+pandas>=2.2.3"""
     }
     # Add more presets here in the future
 }
