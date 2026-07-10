@@ -385,6 +385,14 @@ plotly==5.22.0"""
         "project_type": "Streamlit Website",
         "python_version": "Python 3.13.14",
         "requirements": """streamlit==1.39.00"""
+    },
+    "IOT API Guide (Python 3.14.6)": {
+        "project_type": "IOT API Guide",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.35.0
+requests>=2.31.0
+pandas>=2.0.0
+plotly>=5.15.0"""
     }
     # Add more presets here in the future
 }
