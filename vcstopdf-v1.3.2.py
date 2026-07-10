@@ -65,6 +65,13 @@ pandas>=2.2.0"""
         "requirements": """streamlit>=1.38.0
 pandas>=2.2.0                  # For any future data handling / reports
 plotly>=5.24.0"""
+    },
+    "Burst Agents To JSON (Python 3.14.6)": {
+        "project_type": "Burst Agents To JSON",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.38.0
+pandas>=2.2.0          # Good to have for future data handling
+openpyxl>=3.1.0        # If you want Excel export later"""
     }
     # Add more presets here in the future
 }
