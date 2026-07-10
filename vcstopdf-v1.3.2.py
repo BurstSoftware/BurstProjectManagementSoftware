@@ -443,7 +443,6 @@ pandas==2.2.3"""
         "requirements": """streamlit==1.39.0
 pandas==2.2.3"""
     },
-    ,
     "SEO zero click search demo (Python 3.12.13)": {
         "project_type": "zero click search demo",
         "python_version": "Python 3.12.13",
