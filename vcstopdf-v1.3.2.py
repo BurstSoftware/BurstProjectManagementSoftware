@@ -393,6 +393,14 @@ plotly==5.22.0"""
 requests>=2.31.0
 pandas>=2.0.0
 plotly>=5.15.0"""
+    }    "Data Mining (Python 3.10.20)": {
+        "project_type": "Data Mining",
+        "python_version": "Python 3.10.20",
+        "requirements": """streamlit==1.38.0
+pandas==2.2.2
+numpy==1.26.4
+matplotlib==3.9.2
+seaborn==0.13.2"""
     }
     # Add more presets here in the future
 }
