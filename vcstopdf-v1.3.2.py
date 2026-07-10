@@ -72,6 +72,11 @@ plotly>=5.24.0"""
         "requirements": """streamlit>=1.38.0
 pandas>=2.2.0          # Good to have for future data handling
 openpyxl>=3.1.0        # If you want Excel export later"""
+    },
+    "Prompt Library (Python 3.14.6)": {
+        "project_type": "Prompt Library",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.38.0"""
     }
     # Add more presets here in the future
 }
