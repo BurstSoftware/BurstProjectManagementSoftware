@@ -253,6 +253,12 @@ numpy>=1.26.0"""
         "python_version": "Python 3.14.6",
         "requirements": """streamlit>=1.32.0
 pandas>=2.0.0"""
+    },
+    "Kia-models (Python 3.14.6)": {
+        "project_type": "Kia-models",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.33,<2.0
+pandas>=2.2,<3.0"""
     }
     # Add more presets here in the future
 }
