@@ -310,6 +310,18 @@ pyaudio>=0.2.13"""
 pandas==2.2.3
 numpy==2.1.2
 pyarrow==18.0.0"""
+    },
+    "Ideas To Software (Python 3.14.6)": {
+        "project_type": "Ideas To Software",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit==1.32.0
+streamlit-ace==0.1.1
+reportlab==4.3.1
+google-generativeai==0.3.2
+streamlit-extras==0.3.5
+streamlit-option-menu==0.3.6
+speechrecognition==3.10.0
+requests>=2.31.0"""
     }
     # Add more presets here in the future
 }
