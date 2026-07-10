@@ -278,6 +278,12 @@ fpdf==1.7.2"""
         "python_version": "Python 3.14.6",
         "requirements": """streamlit==1.41.1
 pandas==2.2.3"""
+    },
+    "Writing Tools (Python 3.14.6)": {
+        "project_type": "Writing Tools",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.30.0
+google-generativeai>=0.5.0"""
     }
     # Add more presets here in the future
 }
