@@ -463,7 +463,13 @@ matplotlib==3.9.2
 seaborn==0.13.2
 requests==2.32.3
 scipy==1.14.1"""
-    }
+    },
+     "CRM 2 (Python 3.13.14)": {
+        "project_type": "CRM 2",
+        "python_version": "Python 3.13.14",
+        "requirements": """streamlit==1.38.0
+pandas==2.2.2
+plotly==5.22.0"""
     # Add more presets here in the future
 }
 # Function to create download PDF link
