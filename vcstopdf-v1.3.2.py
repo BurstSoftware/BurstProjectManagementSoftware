@@ -442,6 +442,17 @@ pandas==2.2.3"""
         "python_version": "Python 3.13.14",
         "requirements": """streamlit==1.39.0
 pandas==2.2.3"""
+    },
+    ,
+    "SEO zero click search demo (Python 3.12.13)": {
+        "project_type": "zero click search demo",
+        "python_version": "Python 3.12.13",
+        "requirements": """streamlit==1.38.0
+plotly==5.24.0
+pandas==2.2.2
+pytrends==4.9.2
+requests>=2.31.0
+lxml>=4.9.3"""
     }
     # Add more presets here in the future
 }
