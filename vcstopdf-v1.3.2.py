@@ -93,6 +93,15 @@ pandas>=2.0.0"""
         "project_type": "Grok Build Guide",
         "python_version": "Python 3.14.6",
         "requirements": """streamlit>=1.38.0"""
+    },
+    "Top Selling Products (Python 3.14.6)": {
+        "project_type": "Top Selling Products",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.42
+pandas>=2.2
+altair>=5.4
+numpy>=1.26
+pyarrow>=15.0"""
     }
     # Add more presets here in the future
 }
