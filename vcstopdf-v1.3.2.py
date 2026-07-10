@@ -102,6 +102,12 @@ pandas>=2.2
 altair>=5.4
 numpy>=1.26
 pyarrow>=15.0"""
+    },
+    "C-D-O-Q-v-1 (Python 3.14.6)": {
+        "project_type": "C-D-O-Q-v-1",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.38.0
+pandas>=2.2.0"""
     }
     # Add more presets here in the future
 }
