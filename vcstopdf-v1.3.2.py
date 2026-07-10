@@ -341,6 +341,13 @@ s3fs>=2023.10.0"""
         "python_version": "Python 3.14.6",
         "requirements": """streamlit==1.39.0
 pandas==2.3.3"""
+    },
+    "Task Regression (Python 3.14.6)": {
+        "project_type": "Task Regression",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit==1.50.0
+streamlit-ace==0.1.1
+reportlab==4.4.4"""
     }
     # Add more presets here in the future
 }
