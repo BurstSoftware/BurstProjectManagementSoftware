@@ -322,6 +322,12 @@ streamlit-extras==0.3.5
 streamlit-option-menu==0.3.6
 speechrecognition==3.10.0
 requests>=2.31.0"""
+    },
+    "Data CSV Filter (Python 3.14.6)": {
+        "project_type": "Data CSV Filter",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit==1.39.0
+pandas==2.2.2"""
     }
     # Add more presets here in the future
 }
