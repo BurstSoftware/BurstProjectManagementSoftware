@@ -234,6 +234,12 @@ plotly>=5.24.0"""
         "requirements": """streamlit>=1.44.0
 pandas>=2.2.3
 numpy>=2.2.0"""
+    },
+    "Economics Tools (Python 3.14.6)": {
+        "project_type": "Economics Tools",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.38.0
+pandas>=2.2.0"""
     }
     # Add more presets here in the future
 }
