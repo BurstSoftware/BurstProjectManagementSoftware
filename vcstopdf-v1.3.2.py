@@ -265,6 +265,13 @@ pandas>=2.2,<3.0"""
         "python_version": "Python 3.14.6",
         "requirements": """streamlit>=1.30.0
 pandas>=2.0.0"""
+    },
+    "Property Worksheet (Python 3.14.6)": {
+        "project_type": "Property Worksheet",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit==1.42.0
+pandas==2.2.3
+fpdf==1.7.2"""
     }
     # Add more presets here in the future
 }
