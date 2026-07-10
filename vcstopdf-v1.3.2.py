@@ -213,6 +213,13 @@ altair>=5.0.0"""
 pandas>=2.2.0
 altair>=5.4.0
 plotly>=5.24.0"""
+    },
+    "60-day-interval-amazon-events-reporting-tool-v1 (Python 3.14.6)": {
+        "project_type": "60-day-interval-amazon-events-reporting-tool-v1",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.42.0
+pandas==2.2.2
+altair==5.4.1"""
     }
     # Add more presets here in the future
 }
