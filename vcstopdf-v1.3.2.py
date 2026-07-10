@@ -290,6 +290,13 @@ google-generativeai>=0.5.0"""
         "python_version": "Python 3.14.6",
         "requirements": """streamlit>=1.31.0
 SpeechRecognition>=3.10.0"""
+    },
+    "Speech To Text v1 (Python 3.14.6)": {
+        "project_type": "Speech To Text v1",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.31.0
+SpeechRecognition>=3.10.0
+pyaudio>=0.2.13"""
     }
     # Add more presets here in the future
 }
