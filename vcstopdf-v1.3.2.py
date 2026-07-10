@@ -410,6 +410,14 @@ seaborn==0.13.2"""
 pandas==2.2.3
 fuzzywuzzy==0.18.0
 python-levenshtein==0.26.0"""
+    },
+     "Deep Learning Boilerplate (Python 3.10.20)": {
+        "project_type": "Deep Learning Boilerplate",
+        "python_version": "Python 3.10.20",
+        "requirements": """streamlit==1.39.0
+tensorflow==2.17.0
+numpy==1.26.4
+pillow==10.4.0"""
     }
     # Add more presets here in the future
 }
