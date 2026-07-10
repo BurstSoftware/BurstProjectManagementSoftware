@@ -247,6 +247,12 @@ pandas>=2.2.0"""
         "requirements": """streamlit>=1.39.0
 pandas>=2.2.0
 numpy>=1.26.0"""
+    },
+    "amazon-time-keeper-v1 (Python 3.14.6)": {
+        "project_type": "amazon-time-keeper-v1",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.32.0
+pandas>=2.0.0"""
     }
     # Add more presets here in the future
 }
