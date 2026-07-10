@@ -171,6 +171,24 @@ plotly>=5.18.0"""
         "project_type": "W-R-D-v1",
         "python_version": "Python 3.14.6",
         "requirements": """streamlit>=1.38.0"""
+    },
+    "workplace accountability app (Python 3.14.6)": {
+        "project_type": "workplace accountability app",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.45.1
+watchdog>=6.0.0
+python-dateutil>=2.9.0.post0
+tzdata>=2025.2
+packaging>=25.0
+numpy>=2.2.6
+pandas>=2.2.3
+altair>=5.5.0
+pyarrow>=20.0.0
+protobuf>=6.31.0
+rich>=14.0.0
+requests>=2.32.3
+toml>=0.10.2
+typing_extensions>=4.13.2"""
     }
     # Add more presets here in the future
 }
