@@ -368,6 +368,11 @@ pandas>=2.2.3"""
 requests>=2.31.0
 reportlab>=4.0.9
 graphviz>=0.20.1"""
+    },
+    "Cyber Security Boilerplate App (Python 3.13.14)": {
+        "project_type": "Cyber Security Boilerplate App",
+        "python_version": "Python 3.13.14",
+        "requirements": """streamlit==1.39.00"""
     }
     # Add more presets here in the future
 }
