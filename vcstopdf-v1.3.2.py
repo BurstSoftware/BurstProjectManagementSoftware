@@ -360,6 +360,14 @@ pandas==2.2.3"""
         "python_version": "Python 3.13.14",
         "requirements": """streamlit==1.39.00
 pandas>=2.2.3"""
+    },
+    "Tech Stacks For Companies (Python 3.13.14)": {
+        "project_type": "Tech Stacks For Companies",
+        "python_version": "Python 3.13.14",
+        "requirements": """streamlit>=1.31.0
+requests>=2.31.0
+reportlab>=4.0.9
+graphviz>=0.20.1"""
     }
     # Add more presets here in the future
 }
