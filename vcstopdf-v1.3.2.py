@@ -227,6 +227,13 @@ altair==5.4.1"""
         "requirements": """streamlit>=1.57.0
 pandas>=2.2.0
 plotly>=5.24.0"""
+    },
+    "amazon-rsr-complaint-tool-v1 (Python 3.14.6)": {
+        "project_type": "amazon-rsr-complaint-tool-v1",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.44.0
+pandas>=2.2.3
+numpy>=2.2.0"""
     }
     # Add more presets here in the future
 }
