@@ -125,6 +125,11 @@ pandas>=2.2.0"""
         "project_type": "Cannabis Business",
         "python_version": "Python 3.14.6",
         "requirements": """streamlit==1.38.0"""
+    },
+    "Creator Risk Continuum (Python 3.14.6)": {
+        "project_type": "Creator Risk Continuum",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.38.0"""
     }
     # Add more presets here in the future
 }
