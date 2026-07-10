@@ -335,6 +335,12 @@ pandas==2.2.2"""
         "requirements": """streamlit>=1.28.0
 pandas>=2.0.0
 s3fs>=2023.10.0"""
+    },
+    "Project Management Setup Tool (Python 3.14.6)": {
+        "project_type": "Project Management Setup Tool",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit==1.39.0
+pandas==2.3.3"""
     }
     # Add more presets here in the future
 }
