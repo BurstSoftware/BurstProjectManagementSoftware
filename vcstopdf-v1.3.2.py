@@ -302,6 +302,14 @@ pyaudio>=0.2.13"""
         "project_type": "Logistics Shipping Freight Tools",
         "python_version": "Python 3.14.6",
         "requirements": """streamlit>=1.39.0"""
+    },
+    "CRM (Python 3.14.6)": {
+        "project_type": "CRM",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit==1.40.0
+pandas==2.2.3
+numpy==2.1.2
+pyarrow==18.0.0"""
     }
     # Add more presets here in the future
 }
