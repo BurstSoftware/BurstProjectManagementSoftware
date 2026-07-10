@@ -436,6 +436,12 @@ scikit-learn==1.5.0"""
 streamlit-option-menu==0.3.12
 numpy==2.1.2
 pandas==2.2.3"""
+    },
+    "Dependency Details (Python 3.13.14)": {
+        "project_type": "Dependency Details",
+        "python_version": "Python 3.13.14",
+        "requirements": """streamlit==1.39.0
+pandas==2.2.3"""
     }
     # Add more presets here in the future
 }
