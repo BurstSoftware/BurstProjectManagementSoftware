@@ -189,6 +189,15 @@ rich>=14.0.0
 requests>=2.32.3
 toml>=0.10.2
 typing_extensions>=4.13.2"""
+    },
+    "contradictory-data-driven-environment-v1 (Python 3.14.6)": {
+        "project_type": "contradictory-data-driven-environment-v1",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.45.0
+altair>=5.3.0
+pandas>=2.2.2
+numpy>=2.1.0
+pyarrow>=16.1.0"""
     }
     # Add more presets here in the future
 }
