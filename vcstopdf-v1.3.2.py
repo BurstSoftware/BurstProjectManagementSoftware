@@ -141,6 +141,12 @@ pandas>=2.2.0"""
         "python_version": "Python 3.14.6",
         "requirements": """streamlit>=1.38.0
 pandas>=2.0.0"""
+    },
+    "N8N Guide (Python 3.14.6)": {
+        "project_type": "N8N Guide",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.38.0
+pandas>=2.2.0"""
     }
     # Add more presets here in the future
 }
