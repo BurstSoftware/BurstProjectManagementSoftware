@@ -380,6 +380,11 @@ graphviz>=0.20.1"""
         "requirements": """streamlit==1.38.0
 pandas==2.2.2
 plotly==5.22.0"""
+    },
+    "Streamlit Website (Python 3.13.14)": {
+        "project_type": "Streamlit Website",
+        "python_version": "Python 3.13.14",
+        "requirements": """streamlit==1.39.00"""
     }
     # Add more presets here in the future
 }
