@@ -297,6 +297,11 @@ SpeechRecognition>=3.10.0"""
         "requirements": """streamlit>=1.31.0
 SpeechRecognition>=3.10.0
 pyaudio>=0.2.13"""
+    },
+    "Logistics Shipping Freight Tools (Python 3.14.6)": {
+        "project_type": "Logistics Shipping Freight Tools",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.39.0"""
     }
     # Add more presets here in the future
 }
