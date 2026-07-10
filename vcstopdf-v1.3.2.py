@@ -88,6 +88,11 @@ pandas>=2.0.0"""
         "project_type": "Godot Guide v1",
         "python_version": "Python 3.14.6",
         "requirements": """streamlit>=1.38.0"""
+    },
+    "Grok Build Guide (Python 3.14.6)": {
+        "project_type": "Grok Build Guide",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.38.0"""
     }
     # Add more presets here in the future
 }
