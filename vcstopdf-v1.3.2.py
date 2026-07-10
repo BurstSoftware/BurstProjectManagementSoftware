@@ -471,7 +471,10 @@ scipy==1.14.1"""
 pandas==2.2.2
 plotly==5.22.0"""
     # Add more presets here in the future
-}
+    }
+
+}    
+    
 # Function to create download PDF link
 def create_download_link_pdf(pdf_data, download_filename):
     b64 = base64.b64encode(pdf_data).decode()
