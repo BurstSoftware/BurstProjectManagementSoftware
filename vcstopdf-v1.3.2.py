@@ -453,6 +453,17 @@ pandas==2.2.2
 pytrends==4.9.2
 requests>=2.31.0
 lxml>=4.9.3"""
+    },
+    "Quantitative Research (Python 3.13.14)": {
+        "project_type": "Quantitative Research",
+        "python_version": "Python 3.13.14",
+        "requirements": """streamlit==1.38.0
+pandas==2.2.3
+numpy==2.1.1
+matplotlib==3.9.2
+seaborn==0.13.2
+requests==2.32.3
+scipy==1.14.1"""
     }
     # Add more presets here in the future
 }
