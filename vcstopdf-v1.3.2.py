@@ -259,6 +259,12 @@ pandas>=2.0.0"""
         "python_version": "Python 3.14.6",
         "requirements": """streamlit>=1.33,<2.0
 pandas>=2.2,<3.0"""
+    },
+    "Arc Raiders Workshop Checklist (Python 3.14.6)": {
+        "project_type": "Arc Raiders Workshop Checklist",
+        "python_version": "Python 3.14.6",
+        "requirements": """streamlit>=1.30.0
+pandas>=2.0.0"""
     }
     # Add more presets here in the future
 }
