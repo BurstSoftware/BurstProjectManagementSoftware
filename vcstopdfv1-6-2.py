@@ -31,25 +31,20 @@ def get_file_language(file_name: str) -> str:
 
     # === EXHAUSTIVE LANGUAGE MAP (with HTMX added) ===
     lang_map = {
-        # === Systems & Low-Level ===
+        # Systems & Low-Level
         "c": "c", "h": "c",
         "cpp": "cpp", "cc": "cpp", "cxx": "cpp", "hpp": "cpp", "hxx": "cpp",
-        "rs": "rust",
-        "go": "go",
-        "zig": "zig",
-        "odin": "odin",
-        "v": "v",
-        "nim": "nim",
-        "crystal": "crystal",
+        "rs": "rust", "go": "go", "zig": "zig", "odin": "odin",
+        "v": "v", "nim": "nim", "crystal": "crystal",
         
-        # === Assembly ===
+        # Assembly
         "asm": "asm", "s": "asm", "S": "asm", "nasm": "nasm",
         
-        # === Fortran & Scientific ===
+        # Fortran & Scientific
         "f": "fortran", "f90": "fortran", "f95": "fortran", "f03": "fortran",
         "f08": "fortran", "for": "fortran", "f77": "fortran",
         
-        # === Functional & Lisp ===
+        # Functional & Lisp
         "lisp": "lisp", "cl": "lisp", "el": "elisp", "scm": "scheme", "rkt": "racket",
         "hs": "haskell", "lhs": "haskell",
         "ml": "ocaml", "mli": "ocaml",
@@ -57,7 +52,7 @@ def get_file_language(file_name: str) -> str:
         "erl": "erlang", "hrl": "erlang",
         "ex": "elixir", "exs": "elixir",
         
-        # === Modern & Popular ===
+        # Modern & Popular
         "py": "python", "pyx": "python", "pyi": "python",
         "js": "javascript", "jsx": "jsx", "mjs": "javascript", "cjs": "javascript",
         "ts": "typescript", "tsx": "tsx",
@@ -73,49 +68,37 @@ def get_file_language(file_name: str) -> str:
         "jl": "julia",
         "r": "r", "rmd": "r",
         
-        # === Web & Markup (HTMX added here) ===
-        "html": "html",
-        "htm": "html",
-        "htmx": "html",          # ← HTMX support (uses HTML highlighting)
-        "css": "css",
-        "scss": "scss", "sass": "sass", "less": "less",
+        # Web & Markup (HTMX added here)
+        "html": "html", "htm": "html",
+        "htmx": "html",          # HTMX support
+        "css": "css", "scss": "scss", "sass": "sass", "less": "less",
         "md": "markdown", "markdown": "markdown",
         "rst": "rst", "adoc": "asciidoc",
         
-        # === Data & Config ===
-        "json": "json",
-        "yaml": "yaml", "yml": "yaml",
-        "toml": "toml",
-        "xml": "xml",
-        "ini": "ini", "cfg": "ini", "conf": "ini",
-        "properties": "properties",
-        "env": "bash",
+        # Data & Config
+        "json": "json", "yaml": "yaml", "yml": "yaml", "toml": "toml",
+        "xml": "xml", "ini": "ini", "cfg": "ini", "conf": "ini",
+        "properties": "properties", "env": "bash",
         
-        # === Database & Query ===
-        "sql": "sql",
-        "graphql": "graphql", "gql": "graphql",
+        # Database & Query
+        "sql": "sql", "graphql": "graphql", "gql": "graphql",
         
-        # === Scripting & Shell ===
+        # Scripting & Shell
         "sh": "bash", "bash": "bash", "zsh": "bash", "fish": "fish",
         "ps1": "powershell", "psm1": "powershell",
         "bat": "batch", "cmd": "batch",
         "pl": "perl", "pm": "perl",
         
-        # === Other Notable ===
+        # Other Notable
         "matlab": "matlab", "m": "matlab",
-        "prolog": "prolog",
-        "sol": "solidity",
+        "prolog": "prolog", "sol": "solidity",
         "cu": "cuda", "cuh": "cuda",
         
-        # === Build & Tools ===
-        "cmake": "cmake",
-        "dockerfile": "dockerfile",
-        "proto": "protobuf",
+        # Build & Tools
+        "cmake": "cmake", "dockerfile": "dockerfile", "proto": "protobuf",
         
-        # === Others ===
-        "txt": "text",
-        "log": "text",
-        "k": "text",
+        # Others
+        "txt": "text", "log": "text", "k": "text",
     }
     
     return lang_map.get(ext, "text")
@@ -150,8 +133,7 @@ if st.button("Save Version Information"):
 # File Upload Section
 st.header("Upload Code Files")
 
-# Supported types (HTMX extension included)
-supported_types = list(set([
+supported_types = [
     'py', 'pyx', 'pyi', 'js', 'jsx', 'mjs', 'cjs', 'ts', 'tsx',
     'java', 'kt', 'kts', 'scala', 'c', 'h', 'cpp', 'cc', 'cxx', 'hpp', 'hxx',
     'rs', 'go', 'zig', 'odin', 'v', 'nim', 'crystal',
@@ -165,7 +147,7 @@ supported_types = list(set([
     'sh', 'bash', 'zsh', 'fish', 'ps1', 'psm1', 'bat', 'cmd', 'pl', 'pm',
     'matlab', 'm', 'prolog', 'sol', 'cu', 'cuh',
     'cmake', 'proto', 'dockerfile', 'k', 'txt'
-]))
+]
 
 uploaded_files = st.file_uploader(
     "Upload code files — supports 100+ languages including .md, HTMX, Rust, Go, Julia, Zig, etc.",
