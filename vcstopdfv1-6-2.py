@@ -68,7 +68,7 @@ def get_file_language(file_name: str) -> str:
         "jl": "julia",
         "r": "r", "rmd": "r",
         
-        # Web & Markup (HTMX added here)
+        # Web & Markup
         "html": "html", "htm": "html",
         "htmx": "html",          # HTMX support
         "css": "css", "scss": "scss", "sass": "sass", "less": "less",
