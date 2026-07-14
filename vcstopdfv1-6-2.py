@@ -27,10 +27,7 @@ def get_file_language(file_name: str) -> str:
         return special_files[name_lower]
 
     # Get extension
-    if "." in name_lower:
-        ext = name_lower.split(".")[-1]
-    else:
-        return "text"
+    ext = name_lower.split(".")[-1] if "." in name_lower else ""
 
     # === EXHAUSTIVE LANGUAGE MAP (with HTMX added) ===
     lang_map = {
@@ -171,7 +168,7 @@ supported_types = list(set([
 ]))
 
 uploaded_files = st.file_uploader(
-    "Upload code files — supports 100+ languages including .md, HTMX, Rust, Go, Julia, etc.",
+    "Upload code files — supports 100+ languages including .md, HTMX, Rust, Go, Julia, Zig, etc.",
     accept_multiple_files=True,
     type=supported_types
 )
@@ -197,7 +194,7 @@ if app_version in st.session_state.file_dict:
             language = get_file_language(file_name)
             st.code(file_content, language=language)
 
-# Generate PDF (unchanged)
+# Generate PDF
 if st.button("Generate and Download PDF"):
     if app_version and app_version in st.session_state.file_dict:
         pdf_buffer = BytesIO()
