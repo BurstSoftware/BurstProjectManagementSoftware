@@ -10,35 +10,7 @@ def create_download_link_pdf(pdf_data, download_filename):
     href = f'<a href="data:application/pdf;base64,{b64}" download="{download_filename}">Download PDF</a>'
     return href
 
-def get_file_language(file_name: str) -> str:
-    """Simple language detection for syntax highlighting."""
-    name_lower = file_name.lower()
-    
-    # Special files
-    if "dockerfile" in name_lower:
-        return "dockerfile"
-    if "makefile" in name_lower:
-        return "makefile"
-    
-    # Extension
-    ext = name_lower.split(".")[-1] if "." in name_lower else ""
-    
-    lang_map = {
-        # Core languages
-        "py": "python", "js": "javascript", "jsx": "jsx", "ts": "typescript", "tsx": "tsx",
-        "java": "java", "cpp": "cpp", "c": "c", "cs": "csharp",
-        "go": "go", "rs": "rust", "rb": "ruby", "php": "php",
-        "swift": "swift", "kt": "kotlin", "dart": "dart",
-        "lua": "lua", "jl": "julia", "r": "r",
-        "html": "html", "htm": "html", "htmx": "html",  # HTMX
-        "css": "css", "md": "markdown", "markdown": "markdown",
-        "json": "json", "yaml": "yaml", "yml": "yaml",
-        "sql": "sql", "sh": "bash", "txt": "text",
-    }
-    return lang_map.get(ext, "text")
-
-
-# Session state
+# Initialize session states
 if 'task_list' not in st.session_state:
     st.session_state.task_list = []
 if 'file_dict' not in st.session_state:
@@ -46,9 +18,9 @@ if 'file_dict' not in st.session_state:
 if 'version_info' not in st.session_state:
     st.session_state.version_info = {}
 
-st.title("Codebase Documentation Generator")
+st.title("Markdown Documentation Generator")
 
-# Version Input
+# Version Input Section
 st.header("Version Information")
 col1, col2 = st.columns(2)
 with col1:
@@ -64,16 +36,12 @@ if st.button("Save Version Information"):
             'interpreter_version': interpreter_version
         }
 
-# File Upload
-st.header("Upload Code Files")
-supported_types = ['py','js','jsx','ts','tsx','java','cpp','c','cs','go','rs','rb','php',
-                   'swift','kt','dart','lua','jl','r','html','htm','htmx','css','md',
-                   'markdown','json','yaml','yml','sql','sh','txt']
-
+# File Upload Section — ONLY .md files
+st.header("Upload Markdown Files")
 uploaded_files = st.file_uploader(
-    "Upload files (.md, .py, .js, .html, .htmx, etc.)",
+    "Upload .md files only",
     accept_multiple_files=True,
-    type=supported_types
+    type=['md', 'markdown']
 )
 
 if uploaded_files and app_version:
@@ -85,51 +53,57 @@ if uploaded_files and app_version:
         try:
             file_content = uploaded_file.read().decode('utf-8')
         except UnicodeDecodeError:
-            file_content = "Binary or non-UTF-8 content"
+            file_content = "Binary or non-UTF-8 content - cannot display"
         
         st.session_state.file_dict[app_version][file_name] = file_content
 
-# Preview
-st.header("Codebase Preview")
+# Preview Section (renders Markdown nicely)
+st.header("Markdown Preview")
 if app_version in st.session_state.file_dict:
     for file_name, content in st.session_state.file_dict[app_version].items():
         with st.expander(f"📄 {file_name}"):
-            lang = get_file_language(file_name)
-            st.code(content, language=lang)
+            st.markdown(content)
 
-# PDF Generation
+# Generate PDF
 if st.button("Generate and Download PDF"):
     if app_version and app_version in st.session_state.file_dict:
         pdf_buffer = BytesIO()
         doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, leftMargin=36, rightMargin=36)
         styles = getSampleStyleSheet()
-        elements = []
+        pdf_elements = []
 
-        elements.append(Paragraph(f"App Version: {app_version}", styles['Heading1']))
+        pdf_elements.append(Paragraph(f"App Version: {app_version}", styles['Heading1']))
         if app_version in st.session_state.version_info:
-            ver = st.session_state.version_info[app_version]['interpreter_version']
-            elements.append(Paragraph(f"Interpreter: {ver}", styles['Normal']))
-            elements.append(Spacer(1, 12))
+            interpreter_ver = st.session_state.version_info[app_version]['interpreter_version']
+            pdf_elements.append(Paragraph(f"Interpreter Version: {interpreter_ver}", styles['Normal']))
+            pdf_elements.append(Spacer(1, 10))
 
-        elements.append(Paragraph("Codebase Files:", styles['Heading2']))
-        for name, content in st.session_state.file_dict[app_version].items():
-            elements.append(Paragraph(f"File: {name}", styles['Heading3']))
-            style = ParagraphStyle('Code', fontName='Courier', fontSize=8, leftIndent=10,
-                                   rightIndent=10, leading=8, wordWrap='CJK')
-            elements.append(Preformatted(content, style, maxLineLength=65))
-            elements.append(Spacer(1, 12))
+        pdf_elements.append(Paragraph("Markdown Files:", styles['Heading2']))
+        for file_name, content in st.session_state.file_dict[app_version].items():
+            pdf_elements.append(Paragraph(f"File: {file_name}", styles['Heading3']))
+            code_style = ParagraphStyle(
+                name='CodeStyle',
+                fontName='Courier',
+                fontSize=8,
+                leftIndent=10,
+                rightIndent=10,
+                leading=8,
+                wordWrap='CJK'
+            )
+            pdf_elements.append(Preformatted(content, code_style, maxLineLength=65))
+            pdf_elements.append(Spacer(1, 10))
 
-        doc.build(elements)
+        doc.build(pdf_elements)
         pdf_buffer.seek(0)
-        st.markdown(create_download_link_pdf(pdf_buffer.read(), f"codebase_{app_version}.pdf"),
-                    unsafe_allow_html=True)
+        pdf_data = pdf_buffer.read()
+        st.markdown(create_download_link_pdf(pdf_data, f"docs_{app_version}.pdf"), unsafe_allow_html=True)
     else:
-        st.warning("Please add a version and upload files first.")
+        st.warning("Please add a version and upload .md files first.")
 
 # Saved Versions
 st.write("## Saved Versions")
-for v in st.session_state.task_list:
-    st.write(f"### {v}")
-    if v in st.session_state.version_info:
-        st.write(f"Interpreter: {st.session_state.version_info[v]['interpreter_version']}")
-    st.write(f"Files: {len(st.session_state.file_dict.get(v, {}))}")
+for version in st.session_state.task_list:
+    st.write(f"### App Version: {version}")
+    if version in st.session_state.version_info:
+        st.write(f"**Interpreter Version:** {st.session_state.version_info[version]['interpreter_version']}")
+    st.write(f"Number of .md files: {len(st.session_state.file_dict.get(version, {}))}")
