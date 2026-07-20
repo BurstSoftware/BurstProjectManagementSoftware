@@ -4,204 +4,267 @@ import base64
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatted
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+import google.generativeai as genai
+from streamlit_option_menu import option_menu
+from streamlit_ace import st_ace
+from streamlit_extras.card import card
+import speech_recognition as sr
+import requests  # already in requirements
 
+# ====================== HELPER FUNCTIONS ======================
 def create_download_link_pdf(pdf_data, download_filename):
     b64 = base64.b64encode(pdf_data).decode()
-    href = f'<a href="data:application/pdf;base64,{b64}" download="{download_filename}">Download PDF</a>'
+    href = f'<a href="data:application/pdf;base64,{b64}" download="{download_filename}">📥 Download PDF</a>'
     return href
 
 def get_file_language(file_name: str) -> str:
-    """Map filename or extension to Streamlit syntax highlighting language."""
     name_lower = file_name.lower()
-
-    # Special filenames
     special_files = {
-        "dockerfile": "dockerfile",
-        "docker-compose.yml": "dockerfile",
-        "docker-compose.yaml": "dockerfile",
-        "makefile": "makefile",
-        "gnumakefile": "makefile",
-        "cmakelists.txt": "cmake",
+        "dockerfile": "dockerfile", "makefile": "makefile",
+        "cmakelists.txt": "cmake", "docker-compose.yml": "yaml",
     }
     if name_lower in special_files:
         return special_files[name_lower]
-
-    # Get extension
     ext = name_lower.split(".")[-1] if "." in name_lower else ""
-    
-    # === EXHAUSTIVE LANGUAGE MAP (HTMX included) ===
     lang_map = {
-        # Systems & Low-Level
-        "c": "c", "h": "c",
-        "cpp": "cpp", "cc": "cpp", "cxx": "cpp", "hpp": "cpp", "hxx": "cpp",
-        "rs": "rust", "go": "go", "zig": "zig", "odin": "odin",
-        "v": "v", "nim": "nim", "crystal": "crystal",
-        
-        # Assembly
-        "asm": "asm", "s": "asm", "S": "asm", "nasm": "nasm",
-        
-        # Fortran & Scientific
-        "f": "fortran", "f90": "fortran", "f95": "fortran",
-        "f03": "fortran", "f08": "fortran", "for": "fortran", "f77": "fortran",
-        
-        # Functional & Lisp
-        "lisp": "lisp", "cl": "lisp", "el": "elisp", "scm": "scheme", "rkt": "racket",
-        "hs": "haskell", "lhs": "haskell",
-        "ml": "ocaml", "mli": "ocaml",
-        "fs": "fsharp", "fsx": "fsharp", "fsi": "fsharp",
-        "erl": "erlang", "hrl": "erlang",
-        "ex": "elixir", "exs": "elixir",
-        
-        # Modern & Popular
-        "py": "python", "pyx": "python", "pyi": "python",
-        "js": "javascript", "jsx": "jsx", "mjs": "javascript", "cjs": "javascript",
-        "ts": "typescript", "tsx": "tsx",
-        "java": "java",
-        "kt": "kotlin", "kts": "kotlin",
-        "scala": "scala", "sc": "scala",
-        "cs": "csharp",
-        "rb": "ruby",
-        "php": "php",
-        "swift": "swift",
-        "dart": "dart",
-        "lua": "lua",
-        "jl": "julia",
-        "r": "r", "rmd": "r",
-        
-        # Web & Markup
-        "html": "html", "htm": "html",
-        "htmx": "html",          # HTMX support
-        "css": "css", "scss": "scss", "sass": "sass", "less": "less",
-        "md": "markdown", "markdown": "markdown",
-        "rst": "rst", "adoc": "asciidoc",
-        
-        # Data & Config
-        "json": "json", "yaml": "yaml", "yml": "yaml", "toml": "toml",
-        "xml": "xml", "ini": "ini", "cfg": "ini", "conf": "ini",
-        "properties": "properties", "env": "bash",
-        
-        # Database & Query
-        "sql": "sql", "graphql": "graphql", "gql": "graphql",
-        
-        # Scripting & Shell
-        "sh": "bash", "bash": "bash", "zsh": "bash", "fish": "fish",
-        "ps1": "powershell", "psm1": "powershell",
-        "bat": "batch", "cmd": "batch",
-        "pl": "perl", "pm": "perl",
-        
-        # Others
-        "matlab": "matlab", "m": "matlab",
-        "prolog": "prolog", "sol": "solidity",
-        "cu": "cuda", "cuh": "cuda",
-        "cmake": "cmake", "proto": "protobuf",
-        "txt": "text", "log": "text", "k": "text",
+        "py": "python", "js": "javascript", "ts": "typescript", "html": "html",
+        "htmx": "html", "css": "css", "md": "markdown", "json": "json",
+        "yaml": "yaml", "yml": "yaml", "sql": "sql", "sh": "bash",
+        "rs": "rust", "go": "go", "cpp": "c_cpp", "c": "c",
+        # add more as needed
     }
-    
     return lang_map.get(ext, "text")
 
+def get_gemini_response(api_key: str, prompt: str, code_context: str = "") -> str:
+    """Generate content using Gemini (google-generativeai 0.3.2)"""
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-pro')  # works well with 0.3.2
+        full_prompt = f"{prompt}\n\nCode Context:\n{code_context}" if code_context else prompt
+        response = model.generate_content(full_prompt)
+        return response.text
+    except Exception as e:
+        return f"Error with Gemini: {str(e)}"
 
-# Initialize session states
+def transcribe_speech():
+    """Voice input using speechrecognition"""
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        st.info("🎤 Listening... Speak now (max 10 seconds)")
+        try:
+            audio = recognizer.listen(source, timeout=10, phrase_time_limit=10)
+            text = recognizer.recognize_google(audio)
+            return text
+        except sr.UnknownValueError:
+            return "Could not understand audio"
+        except sr.RequestError as e:
+            return f"Speech service error: {e}"
+        except Exception as e:
+            return f"Microphone error: {e}"
+
+# ====================== SESSION STATE ======================
 if 'task_list' not in st.session_state:
     st.session_state.task_list = []
 if 'file_dict' not in st.session_state:
     st.session_state.file_dict = {}
 if 'version_info' not in st.session_state:
     st.session_state.version_info = {}
+if 'ai_notes' not in st.session_state:
+    st.session_state.ai_notes = {}
 
-st.title("Codebase Documentation Generator")
+st.set_page_config(page_title="Codebase Documentation Generator", layout="wide")
 
-# Version Input
-st.header("Version Information")
-col1, col2 = st.columns(2)
-with col1:
-    app_version = st.text_input("App Version:")
-with col2:
-    interpreter_version = st.text_input("Interpreter Version:", placeholder="e.g., Python 3.12")
+# ====================== SIDEBAR NAVIGATION ======================
+with st.sidebar:
+    selected = option_menu(
+        "Main Menu",
+        ["🏠 Home", "📤 Upload Files", "👁️ Preview & Edit", "🤖 AI Assistant", "🎤 Voice Notes", "📄 Generate PDF"],
+        icons=["house", "cloud-upload", "eye", "robot", "mic", "file-pdf"],
+        menu_icon="cast",
+        default_index=0,
+        orientation="vertical"
+    )
 
-if st.button("Save Version Information"):
-    if app_version and app_version not in st.session_state.task_list:
-        st.session_state.task_list.append(app_version)
-        st.session_state.version_info[app_version] = {
-            'app_version': app_version,
-            'interpreter_version': interpreter_version
-        }
+st.title("📄 Codebase Documentation Generator")
 
-# File Upload
-st.header("Upload Code Files")
+# ====================== HOME / VERSION ======================
+if selected == "🏠 Home":
+    st.header("Version Information")
+    col1, col2 = st.columns(2)
+    with col1:
+        app_version = st.text_input("App Version", placeholder="v1.0.0")
+    with col2:
+        interpreter_version = st.text_input("Interpreter Version", value="Python 3.14.6")
 
-supported_types = [
-    'py','pyx','pyi','js','jsx','mjs','cjs','ts','tsx','java','kt','kts','scala','sc',
-    'c','h','cpp','cc','cxx','hpp','hxx','rs','go','zig','odin','v','nim','crystal',
-    'asm','s','S','nasm','f','f90','f95','f03','f08','for','f77',
-    'lisp','cl','el','scm','rkt','hs','lhs','ml','mli','fs','fsx','fsi',
-    'erl','hrl','ex','exs','rb','php','swift','dart','lua','jl','r','rmd',
-    'html','htm','htmx','css','scss','sass','less','md','markdown','rst','adoc',
-    'json','yaml','yml','toml','xml','ini','cfg','conf','properties','env',
-    'sql','graphql','gql','sh','bash','zsh','fish','ps1','psm1','bat','cmd',
-    'pl','pm','matlab','m','prolog','sol','cu','cuh','cmake','proto','dockerfile',
-    'k','txt'
-]
+    if st.button("💾 Save Version", type="primary"):
+        if app_version and app_version not in st.session_state.task_list:
+            st.session_state.task_list.append(app_version)
+            st.session_state.version_info[app_version] = {
+                'app_version': app_version,
+                'interpreter_version': interpreter_version
+            }
+            st.success(f"Version {app_version} saved!")
+        elif app_version:
+            st.info("Version already exists.")
 
-uploaded_files = st.file_uploader(
-    "Upload code files — supports 100+ languages including .md, HTMX, Rust, Go, Julia, Zig, etc.",
-    accept_multiple_files=True,
-    type=supported_types
-)
+    st.divider()
+    st.subheader("Saved Versions")
+    for version in st.session_state.task_list:
+        with st.expander(f"Version: {version}"):
+            info = st.session_state.version_info.get(version, {})
+            st.write(f"**Interpreter:** {info.get('interpreter_version', 'N/A')}")
+            st.write(f"**Files:** {len(st.session_state.file_dict.get(version, {}))}")
 
-if uploaded_files and app_version:
-    if app_version not in st.session_state.file_dict:
-        st.session_state.file_dict[app_version] = {}
-    
-    for uploaded_file in uploaded_files:
-        file_name = uploaded_file.name
-        try:
-            file_content = uploaded_file.read().decode('utf-8')
-        except UnicodeDecodeError:
-            file_content = "Binary or non-UTF-8 content - cannot display"
-        
-        st.session_state.file_dict[app_version][file_name] = file_content
+# ====================== UPLOAD ======================
+elif selected == "📤 Upload Files":
+    st.header("Upload Code Files")
+    supported_types = ['py','js','ts','html','css','md','json','yaml','yml','sql','sh','rs','go','cpp','c','txt']
 
-# Preview
-st.header("Codebase Preview")
-if app_version in st.session_state.file_dict:
-    for file_name, file_content in st.session_state.file_dict[app_version].items():
-        with st.expander(f"File: {file_name}"):
-            language = get_file_language(file_name)
-            st.code(file_content, language=language)
+    uploaded_files = st.file_uploader(
+        "Upload multiple code files",
+        accept_multiple_files=True,
+        type=supported_types
+    )
 
-# PDF Generation
-if st.button("Generate and Download PDF"):
-    if app_version and app_version in st.session_state.file_dict:
-        pdf_buffer = BytesIO()
-        doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, leftMargin=36, rightMargin=36)
-        styles = getSampleStyleSheet()
-        pdf_elements = []
+    app_version = st.selectbox("Select Version for these files", 
+                               options=st.session_state.task_list or ["New Version"])
 
-        pdf_elements.append(Paragraph(f"App Version: {app_version}", styles['Heading1']))
-        if app_version in st.session_state.version_info:
-            interpreter_ver = st.session_state.version_info[app_version]['interpreter_version']
-            pdf_elements.append(Paragraph(f"Interpreter Version: {interpreter_ver}", styles['Normal']))
-            pdf_elements.append(Spacer(1, 10))
+    if uploaded_files and app_version:
+        if app_version not in st.session_state.file_dict:
+            st.session_state.file_dict[app_version] = {}
+        for file in uploaded_files:
+            content = file.read().decode('utf-8', errors='ignore')
+            st.session_state.file_dict[app_version][file.name] = content
+        st.success(f"Uploaded {len(uploaded_files)} file(s) to version {app_version}")
 
-        pdf_elements.append(Paragraph("Codebase Files:", styles['Heading2']))
-        for file_name, file_content in st.session_state.file_dict[app_version].items():
-            pdf_elements.append(Paragraph(f"File: {file_name}", styles['Heading3']))
-            code_style = ParagraphStyle('CodeStyle', fontName='Courier', fontSize=8,
-                                        leftIndent=10, rightIndent=10, leading=8, wordWrap='CJK')
-            pdf_elements.append(Preformatted(file_content, code_style, maxLineLength=65))
-            pdf_elements.append(Spacer(1, 10))
+# ====================== PREVIEW & EDIT (with st_ace) ======================
+elif selected == "👁️ Preview & Edit":
+    st.header("Code Preview & Editor")
+    if st.session_state.file_dict:
+        version = st.selectbox("Select Version", list(st.session_state.file_dict.keys()))
+        if version:
+            file_names = list(st.session_state.file_dict[version].keys())
+            selected_file = st.selectbox("Select File", file_names)
+            if selected_file:
+                content = st.session_state.file_dict[version][selected_file]
+                language = get_file_language(selected_file)
 
-        doc.build(pdf_elements)
-        pdf_buffer.seek(0)
-        pdf_data = pdf_buffer.read()
-        st.markdown(create_download_link_pdf(pdf_data, f"codebase_{app_version}.pdf"), unsafe_allow_html=True)
+                st.write(f"**Editing:** {selected_file}")
+                edited_content = st_ace(
+                    value=content,
+                    language=language,
+                    theme="monokai",
+                    key=f"ace_{version}_{selected_file}",
+                    height=500,
+                    show_gutter=True,
+                    show_print_margin=False
+                )
+
+                if st.button("💾 Save Changes"):
+                    st.session_state.file_dict[version][selected_file] = edited_content
+                    st.success("Changes saved!")
     else:
-        st.warning("Please upload files and specify an app version before generating PDF.")
+        st.info("Upload files first in the Upload section.")
 
-# Saved versions
-st.write("## Saved Versions")
-for version in st.session_state.task_list:
-    st.write(f"### App Version: {version}")
-    if version in st.session_state.version_info:
-        st.write(f"**Interpreter Version:** {st.session_state.version_info[version]['interpreter_version']}")
-    st.write(f"Number of files: {len(st.session_state.file_dict.get(version, {}))}")
+# ====================== AI ASSISTANT (Gemini) ======================
+elif selected == "🤖 AI Assistant":
+    st.header("🤖 AI-Powered Documentation Assistant")
+    
+    api_key = st.text_input("Enter your Gemini API Key", type="password", 
+                            help="Get free key at https://aistudio.google.com/app/apikey")
+
+    if not api_key:
+        st.warning("Please enter your Gemini API key to use AI features.")
+    else:
+        version = st.selectbox("Select Version", list(st.session_state.file_dict.keys()) if st.session_state.file_dict else [])
+        
+        if version:
+            file_options = ["All Files"] + list(st.session_state.file_dict[version].keys())
+            target = st.selectbox("Target", file_options)
+
+            prompt = st.text_area("What would you like Gemini to do?", 
+                                  value="Generate a clear technical summary and documentation for this code.")
+
+            if st.button("🚀 Generate with Gemini", type="primary"):
+                code_context = ""
+                if target == "All Files":
+                    for fname, fcontent in st.session_state.file_dict[version].items():
+                        code_context += f"\n\n=== {fname} ===\n{fcontent[:3000]}"
+                else:
+                    code_context = st.session_state.file_dict[version][target]
+
+                with st.spinner("Gemini is thinking..."):
+                    result = get_gemini_response(api_key, prompt, code_context)
+
+                st.subheader("Gemini Response")
+                st.markdown(result)
+
+                # Save as note
+                if st.button("💾 Save as AI Note"):
+                    note_key = f"{version}_{target}"
+                    st.session_state.ai_notes[note_key] = result
+                    st.success("Note saved!")
+
+# ====================== VOICE NOTES ======================
+elif selected == "🎤 Voice Notes":
+    st.header("🎤 Voice Notes (Speech-to-Text)")
+    st.info("Works best when running locally with microphone access.")
+
+    if st.button("🎙️ Start Recording"):
+        transcribed = transcribe_speech()
+        st.text_area("Transcribed Text", transcribed, height=150)
+
+        version = st.selectbox("Save to Version", st.session_state.task_list)
+        if st.button("Save Voice Note"):
+            if version not in st.session_state.ai_notes:
+                st.session_state.ai_notes[version] = ""
+            st.session_state.ai_notes[version] += f"\n[Voice Note] {transcribed}\n"
+            st.success("Voice note saved!")
+
+    if st.session_state.ai_notes:
+        st.subheader("Saved Notes")
+        for key, note in st.session_state.ai_notes.items():
+            with st.expander(key):
+                st.write(note)
+
+# ====================== PDF GENERATION ======================
+elif selected == "📄 Generate PDF":
+    st.header("Generate Documentation PDF")
+    
+    if st.session_state.file_dict:
+        version = st.selectbox("Version for PDF", list(st.session_state.file_dict.keys()))
+        
+        include_ai = st.checkbox("Include AI-generated notes/summaries (if available)")
+
+        if st.button("📄 Generate PDF", type="primary"):
+            pdf_buffer = BytesIO()
+            doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, 
+                                    leftMargin=36, rightMargin=36, topMargin=36, bottomMargin=36)
+            styles = getSampleStyleSheet()
+            elements = []
+
+            elements.append(Paragraph(f"Codebase Documentation - {version}", styles['Heading1']))
+            if version in st.session_state.version_info:
+                elements.append(Paragraph(
+                    f"Interpreter: {st.session_state.version_info[version]['interpreter_version']}", 
+                    styles['Normal']))
+            elements.append(Spacer(1, 20))
+
+            for fname, fcontent in st.session_state.file_dict[version].items():
+                elements.append(Paragraph(f"File: {fname}", styles['Heading2']))
+                code_style = ParagraphStyle('Code', fontName='Courier', fontSize=7, leading=9)
+                elements.append(Preformatted(fcontent[:12000], code_style))
+                elements.append(Spacer(1, 15))
+
+            # Add AI notes if requested
+            if include_ai and version in st.session_state.ai_notes:
+                elements.append(Paragraph("AI-Generated Notes", styles['Heading1']))
+                elements.append(Preformatted(st.session_state.ai_notes[version][:8000], code_style))
+
+            doc.build(elements)
+            pdf_buffer.seek(0)
+            st.markdown(create_download_link_pdf(pdf_buffer.read(), f"codebase_{version}.pdf"), unsafe_allow_html=True)
+    else:
+        st.warning("Upload files first.")
+
+st.caption("Built with Streamlit 1.32.0 + your specified packages | Python 3.14.6 compatible")
